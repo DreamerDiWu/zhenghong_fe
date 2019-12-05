@@ -56,23 +56,23 @@ export const constantRoutes = [
   },
 
   {
-    path: '/example',
+    path: '/project',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'example' },
+    redirect: '/project/my_project',
+    name: '项目管理',
+    meta: { title: '项目管理', icon: 'example' },
     children: [
       {
-        path: 'table',
-        name: 'Table',
+        path: 'my_project',
+        name: '我的项目',
         component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
+        meta: { title: '我的项目', icon: 'table' }
       },
       {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
+        path: 'new_project',
+        name: '立项',
+        component: () => import('@/views/new_project/index'),
+        meta: { title: '立项', icon: 'tree' }
       }
     ]
   },
