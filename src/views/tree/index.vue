@@ -1,78 +1,52 @@
 <template>
-  <div class="app-container">
-    <el-input v-model="filterText" placeholder="Filter keyword" style="margin-bottom:30px;" />
-
-    <el-tree
-      ref="tree2"
-      :data="data2"
-      :props="defaultProps"
-      :filter-node-method="filterNode"
-      class="filter-tree"
-      default-expand-all
-    />
-
-  </div>
+  <project-form :projectForm="projectFormData">
+  </project-form>
 </template>
-
 <script>
-export default {
-
-  data() {
-    return {
-      filterText: '',
-      data2: [{
-        id: 1,
-        label: 'Level one 1',
-        children: [{
-          id: 4,
-          label: 'Level two 1-1',
-          children: [{
-            id: 9,
-            label: 'Level three 1-1-1'
-          }, {
-            id: 10,
-            label: 'Level three 1-1-2'
-          }]
-        }]
-      }, {
-        id: 2,
-        label: 'Level one 2',
-        children: [{
-          id: 5,
-          label: 'Level two 2-1'
-        }, {
-          id: 6,
-          label: 'Level two 2-2'
-        }]
-      }, {
-        id: 3,
-        label: 'Level one 3',
-        children: [{
-          id: 7,
-          label: 'Level two 3-1'
-        }, {
-          id: 8,
-          label: 'Level two 3-2'
-        }]
-      }],
-      defaultProps: {
-        children: 'children',
-        label: 'label'
-      }
+import ProjectForm from '../../components/Form/ProjectForm.vue'
+  export default {
+  components: {
+    ProjectForm
+  },
+    data() {  
+      return {
+        projectFormData: {
+          name: '',
+          date: '',
+          depart: '',
+          busz_type: '',
+          busz_type_extra: '',
+          roles: ['实习人员', '助理人员', '复核人员', '报告签发人员'],
+          
+          memberConfigData: [{
+            role: '项目负责人',
+            name: '王小虎',
+            salary: '1.0',
+            job: '',
+            }, {
+            role: '项目经理',
+            name: '王小虎',
+            salary: '0.7',
+            job: '',
+            }, {
+            role: '助理人员',
+            name: '王小虎',
+            salary: '0.5',
+            job: '', 
+          }],
+          tableCol: [
+            {label: '项目角色', prop: 'role'},
+            {label: '名字', prop: 'name'},
+            {label: '工时标准', prop: 'salary'},
+            {label: '分工', prop: 'job'},
+          ],
+          start_date: '',
+          processing_dur: '',
+          review_dur: '',
+          finish_date: ''
+        },
     }
   },
-  watch: {
-    filterText(val) {
-      this.$refs.tree2.filter(val)
-    }
-  },
-
-  methods: {
-    filterNode(value, data) {
-      if (!value) return true
-      return data.label.indexOf(value) !== -1
-    }
-  }
 }
 </script>
 

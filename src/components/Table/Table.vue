@@ -1,18 +1,19 @@
 <!--表格组件 -->
 <template>
-<section class="ces-table-page">
+<el-container class="ces-table-page">
   <!-- 表格操作按钮 -->
-    <section class="ces-handle" v-if='isHandle'>
+    <el-header class="ces-handle" v-if='isHandle' height="30px">
       <el-button 
         v-for='item in tableHandles' 
         :key='item.label'
         :size="size || item.size" 
         :type="item.type" 
         :icon='item.icon' 
+        :style="item.style"
         @click="item.handle(that)">{{item.label}}</el-button>
-    </section>
+    </el-header>
     <!-- 数据表格 -->
-    <section class="ces-table">
+    <el-main class="ces-table">
         <el-table  :data='tableData' :size='size' height="100%" 
           :border  ='isBorder'
           @select='select' 
@@ -97,9 +98,9 @@
                 </template>
               </el-table-column>
         </el-table>
-    </section>
+    </el-main>
     <!-- 分页 -->
-    <section class="ces-pagination"  v-if='isPagination'>
+    <el-footer class="ces-pagination"  v-if='isPagination'>
         <el-pagination style='display: flex;justify-content: center;height: 100%;align-items: center;'
             @current-change="handleCurrentChange"
             @size-change="handleSizeChange"
@@ -108,8 +109,8 @@
             :current-page="tablePage.pageNum"
             :total="tablePage.total"
         ></el-pagination>
-    </section>
-</section>
+    </el-footer>
+</el-container>
 </template>
 
 <script>

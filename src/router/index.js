@@ -89,7 +89,12 @@ export const constantRoutes = [
       }
     ]
   },
-
+  {
+    path: '/tree',
+    name: 'Tree',
+    component: () => import('@/views/tree/index'),
+    meta: { title: 'Tree', icon: 'form' }
+  },
   {
     path: '/nested',
     component: Layout,

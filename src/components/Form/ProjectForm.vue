@@ -7,9 +7,8 @@
   </el-form-item>
   <el-form-item style="width: 300px" label="日期" required prop="date">
     <el-tooltip effect="dark" content="日期格式：年-月-日: 时" placement="right-end">
-        <el-date-picker type="datetime" placeholder="选择项目安排日期" v-model="projectForm.date" style="width: 100%;" :default-value="getDate(date)" format="yyyy-MM-dd HH:00:00" value-format="yyyy-MM-dd:HH:mm:ss"></el-date-picker>
-    </el-tooltip>
-  </el-form-item>
+        <el-date-picker type="datetime" placeholder="选择项目安排日期" v-model="projectForm.date" style="width: 100%;" :default-value="getDate(projectForm.date)" format="yyyy-MM-dd HH:00:00" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+    </el-tooltip>  </el-form-item>
   <el-row :gutter="20">
     <el-col :span="4">
     <el-form-item label="部门" prop="depart" required>
@@ -145,6 +144,9 @@
       <el-date-picker
         v-model="projectForm.start_date"
         type="date"
+        format="yyyy-MM-dd"
+        value-format="yyyy-MM-dd"
+        :default-value="getDate(projectForm.start_date)"
         placeholder="选择日期">
       </el-date-picker>
     </el-form-item>
@@ -185,37 +187,14 @@
 </template>
 <script>
   export default {
+    props: {
+        projectForm: {
+            type: Object,
+            default: ()=>{}
+        }
+    },
     data() {
       return {
-        projectForm: {
-          name: '',
-          date: '2019-05-12 21:11:11',
-          depart: '',
-          busz_type: '',
-          busz_type_extra: '',
-          roles: ['实习人员', '助理人员', '复核人员', '报告签发人员'],
-          
-          memberConfigData: [{
-            role: '项目负责人',
-            name: '王小虎',
-            salary: '1.0',
-            job: '',
-            }, {
-            role: '项目经理',
-            name: '王小虎',
-            salary: '0.7',
-            job: '',
-            }, {
-            role: '助理人员',
-            name: '王小虎',
-            salary: '0.5',
-            job: '', 
-          }],
-          start_date: '2019-10-01',
-          processing_dur: ['2019-11-01', '2019-11-03'],
-          review_dur:  ['2019-11-01', '2019-11-03'],
-          finish_date: '2020-01-01'
-        },
         rowOnEdit: [],
         tmpSaveEditRow: '',
         rules: {
@@ -255,11 +234,6 @@
       },
       initRowOnEdit() {
         return this.projectForm.memberConfigData.map(()=> {false})
-      },
-      sleep(ms) {
-        return new Promise(resolve => 
-            setTimeout(resolve, ms)
-        )
       },
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {

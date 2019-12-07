@@ -9,7 +9,7 @@
                 :disabled="item.disable && item.disable(searchData[item.prop])">
             </el-input>
             <!-- 下拉框 -->
-            <el-select v-if="item.type==='select'" v-model="searchData[item.prop]" :size="size || item.size" :style="{width:item.width}"
+            <el-select v-if="item.type==='select'" multiple v-model="searchData[item.prop]" :size="size || item.size" :style="{width:item.width}"
                 @change="item.change(that,searchData[item.prop])" 
                 :disabled="item.disable && item.disable(searchData[item.prop])">
                 <el-option v-for="op in item.options" :label="op.label" :value="op.value" :key="op.value"></el-option>
@@ -51,7 +51,7 @@
                 @change="item.change(that,searchData[item.prop])" :style="{width:item.width}"
                 :disabled="item.disable && item.disable(searchData[item.prop])"></el-switch>
         </el-form-item>
-        <el-form-item v-for='item in searchHandle' :key="item.label">
+                <el-form-item v-for='item in searchHandle' :key="item.label">
             <el-button :type="item.type" :size="size || item.size" @click='item.handle(that)'>{{item.label}}</el-button>
         </el-form-item>
     </el-form>
