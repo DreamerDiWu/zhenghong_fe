@@ -196,6 +196,10 @@
         update: {
           type: Boolean,
           default: false
+        },
+        confirmCallBack: {
+          type: Function,
+          default: ()=>{}
         }
     },
     data() {
@@ -249,9 +253,10 @@
               message: "创建成功",
               type: 'success'
             });
-            this.$router.push({'path':'/project/my_project'})
+            this.confirmCallBack(0)
           } else {
             this.$message.error('创建失败，请检查后正确填写');
+            this.confirmCallBack(1)
           }
         });
       },
@@ -262,9 +267,10 @@
               message: "更新成功",
               type: 'success'
             });
-            this.$router.push({'path':'/project/my_project'})
+            this.confirmCallBack(0)
           } else {
             this.$message.error('更新失败，请检查后正确填写');
+            this.confirmCallBack(1)
           }
         });        
       },

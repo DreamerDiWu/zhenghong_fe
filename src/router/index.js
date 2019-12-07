@@ -54,7 +54,11 @@ export const constantRoutes = [
       meta: { title: 'Dashboard', icon: 'dashboard' }
     }]
   },
-
+  {
+    path: '/jump',
+    component: Layout ,
+    redirect: '/project'
+  },
   {
     path: '/project',
     component: Layout,
@@ -65,8 +69,9 @@ export const constantRoutes = [
       {
         path: 'my_project',
         name: '我的项目',
-        component: () => import('@/views/table/index'),
-        meta: { title: '我的项目', icon: 'table' }
+        component: () => import('@/views/my_project/index'),
+        meta: { title: '我的项目', icon: 'table' },
+
       },
       {
         path: 'new_project',

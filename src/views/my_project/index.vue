@@ -41,7 +41,7 @@
       </el-dialog>  
     <!-- 修改表单对话框 -->
       <el-dialog title="项目表单编辑" :visible.sync="editDialogVisible" width="1000px">
-        <project-form :projectForm="editDialogData" :update="true">
+        <project-form :projectForm="editDialogData" :update="true" :confirmCallBack="retcode=>{this.editDialogVisible=(retcode == 0 ? false: true)}">
           </project-form>
       </el-dialog>  
       <!-- 表格 -->
