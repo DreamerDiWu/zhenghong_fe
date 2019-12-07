@@ -7,10 +7,10 @@
   </el-form-item>
   <el-form-item style="width: 300px" label="日期" required prop="date">
     <el-tooltip effect="dark" content="日期格式：年-月-日: 时" placement="right-end">
-        <el-date-picker type="datetime" placeholder="选择项目安排日期" v-model="projectForm.date" style="width: 100%;" :default-value="getDate(projectForm.date)" format="yyyy-MM-dd HH:00:00" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+        <el-date-picker type="datetime" placeholder="选择项目安排日期" v-model="projectForm.date" style="width: 100%;" format="yyyy-MM-dd HH:00:00" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
     </el-tooltip>  </el-form-item>
   <el-row :gutter="20">
-    <el-col :span="4">
+    <el-col :span="6">
     <el-form-item label="部门" prop="depart" required>
         <el-select style="width: 120px" v-model="projectForm.depart" placeholder="请选择部门">
         <el-option value="审计" ></el-option>
@@ -19,7 +19,7 @@
         </el-select>
     </el-form-item>
     </el-col>
-  <el-col :span="4">
+  <el-col :span="6">
     <el-form-item label="业务类型" prop="busz_type" :required="true">
     <el-select v-if="projectForm.depart==''" placeholder="请先选择部门" style="width: 200px">
     </el-select>
@@ -50,7 +50,7 @@
     </el-select> 
     </el-form-item>
     </el-col>
-    <el-col v-if="projectForm.busz_type=='其他'" class="line" :span="6">
+    <el-col v-if="projectForm.busz_type=='其他'" class="line" :span="8">
       <el-form-item prop="busz_type_extra">
         <el-input v-model="projectForm.busz_type_extra" placeholder="请输入具体类型" maxlength="10"/>
       </el-form-item>
@@ -65,7 +65,7 @@
         + 添加项目成员<i class="el-icon-arrow-down el-icon--right"></i>
     </el-button>
       <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item v-for="r, index in projectForm.roles" @click.native="handleNew(r)">{{r}}</el-dropdown-item>
+          <el-dropdown-item v-for="r in roles" :key="r" @click.native="handleNew(r)">{{r}}</el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
   </el-header>
@@ -180,7 +180,8 @@
   </el-main>
   <!-- 提交按钮 -->
   <el-footer style="margin-left:20px">
-    <el-button type="primary" @click="submitForm('projectForm')">立即创建</el-button>
+    <el-button v-if="!update" type="primary" @click="submitForm('projectForm')">立即创建</el-button>
+    <el-button v-if="update" type="primary" @click="submitUpdateForm('projectForm')">立即更新</el-button>
     <el-button @click="resetForm('projectForm')">重置</el-button>
   </el-footer>
 </el-form>    
@@ -191,12 +192,18 @@
         projectForm: {
             type: Object,
             default: ()=>{}
+        },
+        update: {
+          type: Boolean,
+          default: false
         }
     },
     data() {
       return {
         rowOnEdit: [],
         tmpSaveEditRow: '',
+        roles: ['实习人员', '助理人员', '复核人员', '报告签发人员'],
+        
         rules: {
           name: [
             { required: true, message: '请输入项目名称', trigger: 'blur' }
@@ -248,13 +255,26 @@
           }
         });
       },
+      submitUpdateForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.$message({
+              message: "更新成功",
+              type: 'success'
+            });
+            this.$router.push({'path':'/project/my_project'})
+          } else {
+            this.$message.error('更新失败，请检查后正确填写');
+          }
+        });        
+      },
       resetForm(formName) {
         this.$refs[formName].resetFields();
       },
       handleEdit(index, row) {
+        this.tmpSaveEditRow = {...row}
         this.rowOnEdit = this.initRowOnEdit()
         this.rowOnEdit[index] = true 
-        this.tmpSaveEditRow = {...row}
       },
       handleDelete(index, row) {
          this.projectForm.memberConfigData.splice(index, 1)
@@ -267,13 +287,14 @@
         this.rowOnEdit=this.initRowOnEdit();
       },
       handleNew(newRole) {
-          this.projectForm.memberConfigData.push({
+        let newMember = {
             role: newRole,
             name: '未命名',
             salary: '0.0',
-          })
+          }
+        this.projectForm.memberConfigData.push(newMember)
+        this.handleEdit(this.projectForm.memberConfigData.length-1, newMember)
       },
-
     }
   }
 </script>

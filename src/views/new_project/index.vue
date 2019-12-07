@@ -7,7 +7,7 @@
   </el-form-item>
   <el-form-item style="width: 300px" label="日期" required prop="date">
     <el-tooltip effect="dark" content="日期格式：年-月-日: 时" placement="right-end">
-        <el-date-picker type="datetime" placeholder="选择项目安排日期" v-model="projectForm.date" style="width: 100%;" :default-value="getDate(date)" format="yyyy-MM-dd HH:00:00" value-format="yyyy-MM-dd:HH:mm:ss"></el-date-picker>
+        <el-date-picker type="datetime" placeholder="选择项目安排日期" v-model="projectForm.date" style="width: 100%;" format="yyyy-MM-dd HH:00:00" value-format="yyyy-MM-dd:HH:mm:ss"></el-date-picker>
     </el-tooltip>
   </el-form-item>
   <el-row :gutter="20">
@@ -189,7 +189,7 @@
       return {
         projectForm: {
           name: '',
-          date: '2019-05-12 21:11:11',
+          date: '',
           depart: '',
           busz_type: '',
           busz_type_extra: '',
@@ -211,10 +211,10 @@
             salary: '0.5',
             job: '', 
           }],
-          start_date: '2019-10-01',
-          processing_dur: ['2019-11-01', '2019-11-03'],
-          review_dur:  ['2019-11-01', '2019-11-03'],
-          finish_date: '2020-01-01'
+          start_date: '',
+          processing_dur: '',
+          review_dur:  '',
+          finish_date: ''
         },
         rowOnEdit: [],
         tmpSaveEditRow: '',

@@ -41,7 +41,8 @@
       </el-dialog>  
     <!-- 修改表单对话框 -->
       <el-dialog title="项目表单编辑" :visible.sync="editDialogVisible" width="1000px">
-        <project-form :projectForm="editDialogData"></project-form>
+        <project-form :projectForm="editDialogData" :update="true">
+          </project-form>
       </el-dialog>  
       <!-- 表格 -->
     <el-header>
@@ -81,13 +82,12 @@
 </template>
 
 <script>
-import SearchForm from '../../components/Form/SearchForm.vue'
+import ProjectForm from '../../components/Form/ProjectForm.vue'
 export default {
   components: {
-    SearchForm
+    ProjectForm
   },
   data () {
-
     return {
 
 // 模拟数据
@@ -95,6 +95,8 @@ export default {
       rawtableData:[
         {
           name:'项目1',
+          depart: '审计' ,
+          busz_type: '经责',
           status:'实施中',
           owner:'包大人', 
           myRole: '项目负责人', 
@@ -104,7 +106,7 @@ export default {
           processing_dur: ['2019-11-01', '2019-11-03'],
           review_dur:  ['2019-11-01', '2019-11-03'],
           finish_date: '2020-01-01',
-          memberConfig: [{
+          memberConfigData: [{
               role: '项目负责人',
               name: '包大人',
               salary: '1.0',
