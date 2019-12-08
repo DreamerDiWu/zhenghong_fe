@@ -1,5 +1,5 @@
 <template>
-  <project-form :projectForm="projectForm" :confirmCallBack="retcode=>{this.$router.push({path: '/project/my_project'})}"></project-form>
+  <project-form :projectForm="projectForm" :confirmCallBack="retcode=>{if(retcode==0)this.$router.push({path: '/project/my_project'})}"></project-form>
 </template>
 <script>
 import ProjectForm from '../../components/Form/ProjectForm.vue'

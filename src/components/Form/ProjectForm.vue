@@ -56,6 +56,19 @@
       </el-form-item>
     </el-col>
   </el-row>
+  <!-- <el-row>
+    <el-col :span="8"> 
+      <el-form-item label="部门-业务类型"  label-position="right" prop="depart" required label-width="120px">
+        <el-cascader :options="departStruct" placeholder="请选择部门和业务类型" v-model="departItem" @change="handleDepartChange">
+        </el-cascader>
+      </el-form-item>
+    </el-col>
+    <el-col :span="8" v-if="departItem[departItem.length-1] == '其他'">
+      <el-form-item prop="busz_type_extra">
+        <el-input v-model="projectForm.busz_type_extra" placeholder="请输入具体类型" maxlength="10"/>
+      </el-form-item>    
+    </el-col>
+  </el-row> -->
   <!-- 成员配置 -->
   <el-divider content-position="left">项目成员配置</el-divider>
 <el-container style="margin-left:10px">
@@ -204,6 +217,44 @@
     },
     data() {
       return {
+        departStruct: [{
+          value: '审计',
+          label: '审计',
+          children: [
+            {value: '经责',  label: '经责'},
+            {value: '财务收支',  label: '财务收支'},
+            {value: '竣工决算',  label: '竣工决算'},
+            {value: '年报',  label: '年报'},
+            {value: '司法会计',  label: '司法会计'},
+            {value: '咨询服务',  label: '咨询服务'},
+            {value: '其他',  label: '其他'},
+          ]
+        },{
+          value: '评估',
+          label: '评估',
+          children: [
+            {value: '整体资产评估',  label: '整体资产评估'},
+            {value: '单项资产评估',  label: '单项资产评估', children: [
+              {value:'房地产评估', label: '房地产评估'},
+              {value: '机器设备和车辆', label: '机器设备和车辆'}
+            ]},
+            {value: '无形资产评估',  label: '无形资产评估'},
+            {value: '评估鉴定',  label: '评估鉴定'},
+            {value: '其他',  label: '其他'},
+          ]
+        },{
+          value: '工程造价',
+          label: '工程造价',
+          children: [
+            {value: '预算',  label: '预算'},
+            {value: '结算',  label: '结算'},
+            {value: '工程控制',  label: '工程控制'},
+            {value: '咨询服务',  label: '咨询服务'},
+            {value: '司法鉴定',  label: '司法鉴定'},
+            {value: '其他',  label: '其他'},
+          ]
+        }],
+        departItem: [],
         rowOnEdit: [],
         tmpSaveEditRow: '',
         roles: ['实习人员', '助理人员', '复核人员', '报告签发人员'],
@@ -240,6 +291,12 @@
       };
     },
     methods: {
+      handleDepartChange() {
+        if (!this.departItem.length)
+          return 
+        this.projectForm.depart = this.departItem[0]
+        this.projectForm.busz_type = this.departItem[1]
+      },
       getDate(strDate) {
         return new Date(this.projectForm.date.replace(/-/g, "/")) 
       },
@@ -276,6 +333,8 @@
       },
       resetForm(formName) {
         this.$refs[formName].resetFields();
+        this.departItem = []
+        this.projectForm.busz_type_extra = ''
       },
       handleEdit(index, row) {
         this.tmpSaveEditRow = {...row}

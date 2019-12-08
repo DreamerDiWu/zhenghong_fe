@@ -199,7 +199,7 @@ export default {
         {key: col.label, value: detailData[col.prop]}
       ))
       this.detailLogData = detailData.logs
-      this.detailMemberData = detailData.memberConfig
+      this.detailMemberData = detailData.memberConfigData
       this.detailDialogVisible = true;
     },
     showEditDialog(index) {
