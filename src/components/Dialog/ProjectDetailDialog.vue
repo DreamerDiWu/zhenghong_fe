@@ -1,8 +1,8 @@
 <template>
         <!-- 详情页对话框 -->
-      <el-dialog title="项目详情" :visible.sync="detailDialogVisible" width="1000px">
+      <el-dialog title="项目详情" :visible="detailDialogVisible" @close=closeCallBack width="1000px">
         <el-divider content-position="left">基本信息</el-divider>
-        <el-table :data="detailBasicData" :show-header="false" border :cell-style="detailBasicDataCellStyle">
+        <el-table :data="detailBasicData" :show-header="false" border :cell-style="this.detailBasicDataCellStyle">
           <el-table-column prop="key">
           </el-table-column>
           <el-table-column prop="value">
@@ -35,25 +35,28 @@ export default {
         detailData: {
             type: Object,
             default: ()=>{}
+        },
+        closeCallBack: {
+          type: Function,
+          default: ()=>{}
         }
     },
     computed: {
         detailBasicData() {
             return this.detailBasicDataCol.map(col=>(
-                {key: col.label, value: detailData[col.prop]}
+                {key: col.label, value: this.detailData[col.prop]}
             ))
         },
         detailLogData() {
-            return detailData.logs
+            return this.detailData.logs
         },
         detailMemberData() {
-            return detailData.memberConfigData
+            return this.detailData.memberConfigData
         }
     },
     data() {
         return {
         //详情页对话框
-            detailBasicData: [],
             detailBasicDataCol: [
                 {label:'项目名称',prop:'name'},
                 {label:'项目进度',prop:'status'},
@@ -65,14 +68,12 @@ export default {
                 {label:'是否收到款项',prop:'paid'},
             ],
             detailBasicTagItem: ['项目进度', '是否收到款项', '是否计发工资', '是否存档'],
-            detailMemberData: [],
             detailMemberDataCol: [
                     {label: '项目角色', prop: 'role'},
                     {label: '名字', prop: 'name'},
                     {label: '工时标准', prop: 'salary'},
                     {label: '分工', prop: 'job'},
             ],
-            detailLogData: [],
             detailLogDataCol: [
                 {label: '日期', prop: 'date'},
                 {label: '填写人', prop: 'name'},
@@ -81,6 +82,12 @@ export default {
         }
     },
     methods: {
+      detailBasicDataCellStyle({ column }) {
+        if (column.property == 'key') {
+          return 'font-weight: bold;' 
+        }
+        return ''
+      }
     }
 }
 </script>

@@ -95,10 +95,18 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/tree',
-    name: 'Tree',
-    component: () => import('@/views/tree/index'),
-    meta: { title: 'Tree', icon: 'form' }
+    path: '/review',
+    component: Layout,
+    name: 'Review',
+    children: [
+      {
+        path: 'index',
+        name: 'Review',
+        component: () => import('@/views/review/index'),
+        meta: { title: '我的审核', icon: 'form' }
+      }
+    ]
+
   },
   {
     path: '/nested',

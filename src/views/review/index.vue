@@ -1,13 +1,10 @@
 <template>
   <el-container style="width:100%; margin-top:50px">
-    <!-- 日志对话框 -->
+    <!-- 对话框 -->
       <el-dialog title="填写日志" :visible.sync="logDialogVisible">
         <el-form>
-          <el-form-item>
-            <el-date-picker v-model="logTime" value-format="yyyyMMdd" placeholder="请选择日期"/>
-          </el-form-item>
-          <el-form-item>
-            <el-input v-model="logContent"  type="textarea" placeholder="请输入日志内容"/>
+          <el-form-item label="备注">
+            <el-input v-model="logContent"  type="textarea" placeholder="请输入理由"/>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="()=>{logDialogVisible=false; logContent=''; logTime=''; this.$message('已保存')}">保存</el-button>
@@ -21,17 +18,13 @@
     :detailDialogVisible="detailDialogVisible"
     :closeCallBack="()=>{this.detailDialogVisible = false}">
   </project-detail-dialog>
-    <!-- 修改表单对话框 -->
-      <el-dialog title="项目表单编辑" :visible.sync="editDialogVisible" width="1000px">
-        <project-form :projectForm="editDialogData" :update="true" :confirmCallBack="retcode=>{this.editDialogVisible=(retcode == 0 ? false: true)}">
-          </project-form>
-      </el-dialog>  
       <!-- 表格 -->
-    <el-header>
-      <el-button icon="el-icon-plus" @click="toNewProject" type="success">创建项目</el-button>
+    <el-header height="10px">
       <el-input style="width: 300px" v-model="filterName" placeholder="输入项目名称自动检索"/> 
     </el-header>
     <el-main>
+      <el-divider></el-divider>
+      <el-divider content-position="left">待我审核的项目</el-divider>
       <el-table :data="rawtableData.filter(data => !filterName || data.name.includes(filterName))" border>
         <el-table-column label="项目名称">
           <template slot-scope="scope">
@@ -44,21 +37,13 @@
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-dropdown>
-              <el-button icon="el-icon-s-tools" type="primary">
-                管理
-              </el-button>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item 
-                  v-for="handler in manageHandler" 
-                  @click.native="handler.handle(scope.$index, scope.row)">
-                 {{handler.label}}
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
+            <el-button type="success" @click="handlePass(scope.$index, scope.row)">通过</el-button>
+            <el-button type="danger" @click="handleReject(scope.$index, scope.row)">驳回</el-button>
           </template>
         </el-table-column>
       </el-table>
+      <el-divider content-position="left">已审核的项目</el-divider>
+      
     </el-main>
   </el-container>
 </template>
@@ -126,45 +111,23 @@ export default {
       tableCols:[
         {label:'项目进度',prop:'status'},
         {label:'项目负责人',prop:'owner'},
-        {label: '我的角色', prop: 'myRole'},
-        {label:'是否收到款项',prop:'paid'},
       ],
 
 
       // 项目名称模糊查找
       filterName: '',
-      // 录入日志对话框
-      logDialogVisible: false,
-      logContent: '',
-      logTime: '',
+  
 
-      // 管理选项
-      manageHandler: [
-        {label: '修改', handle: index=>{this.showEditDialog(index)}},
-        {label: '申请复核', handle: row=>{this.$message('复核')}},
-        {label: '终止', handle: row=>{this.$message('终止')}},
-        {label: '录入日志', handle: row=>{this.logDialogVisible = true}}
-      ],
       //详情页对话框
       detailDialogVisible: false,
       detailData: {},
 
-      // 修改页对话框
-      editDialogVisible: false,
-      editDialogData: []
     }
   },
   methods: {
-    toNewProject() {
-      this.$router.push({path: '/project/new_project'})
-    },
     showDetailDialog(index) {
       this.detailData = this.rawtableData[index]
       this.detailDialogVisible = true;
-    },
-    showEditDialog(index) {
-      this.editDialogData = {...this.rawtableData[index]}
-      this.editDialogVisible = true;
     },
   },
 
