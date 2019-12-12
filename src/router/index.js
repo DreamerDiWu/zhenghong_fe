@@ -55,11 +55,6 @@ export const constantRoutes = [
     }]
   },
   {
-    path: '/jump',
-    component: Layout ,
-    redirect: '/project'
-  },
-  {
     path: '/project',
     component: Layout,
     redirect: '/project/my_project',
@@ -97,7 +92,6 @@ export const constantRoutes = [
   {
     path: '/review',
     component: Layout,
-    name: 'Review',
     children: [
       {
         path: 'index',
