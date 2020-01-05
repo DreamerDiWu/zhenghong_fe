@@ -58,11 +58,11 @@ export default {
         return {
         //详情页对话框
             detailBasicDataCol: [
-                {label:'项目名称',prop:'name'},
-                {label:'项目进度',prop:'status'},
-                {label:'项目负责人',prop:'owner'},
+                {label:'项目名称',prop:'project_name'},
+                // {label:'项目进度',prop:'status'},
+                {label:'项目负责人',prop:'owner_user_name'},
                 {label: '部门', prop: 'depart'},
-                {label: '业务类型', prop: 'busz_type'},
+                {label: '业务类型', prop: 'business'},
                 {label: '是否存档', prop: 'save'},
                 {label: '是否计发工资', prop: 'checkout'},
                 {label:'是否收到款项',prop:'paid'},
@@ -70,13 +70,13 @@ export default {
             detailBasicTagItem: ['项目进度', '是否收到款项', '是否计发工资', '是否存档'],
             detailMemberDataCol: [
                     {label: '项目角色', prop: 'role'},
-                    {label: '名字', prop: 'name'},
+                    {label: '名字', prop: 'member_user_name'},
                     {label: '工时标准', prop: 'salary'},
                     {label: '分工', prop: 'job'},
             ],
             detailLogDataCol: [
-                {label: '日期', prop: 'date'},
-                {label: '填写人', prop: 'name'},
+                {label: '日期', prop: 'create_time'},
+                {label: '填写人', prop: 'member_user_name'},
                 {label: '日志内容', prop: 'content'},
             ],
         }

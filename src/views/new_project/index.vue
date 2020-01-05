@@ -1,23 +1,19 @@
 <template>
-  <project-form :projectForm="projectForm" :confirmCallBack="retcode=>{if(retcode==0)this.$router.push({path: '/project/my_project'})}"></project-form>
+  <project-form :projectForm="projectForm" :confirmCallBack="handleConfirm"></project-form>
 </template>
 <script>
 import ProjectForm from '../../components/Form/ProjectForm.vue'
+import { create } from '@/api/form'
 export default {
   components: {
     ProjectForm
   },
   data() {
     return {
-      projectForm: {
-        name: '',
-        date: '',
-        depart: '',
-        busz_type: '',
-        busz_type_extra: '',    
+      projectForm: {   
         memberConfigData: [{
           role: '项目负责人',
-          name: '王小虎',
+          name: 'super_user',
           salary: '1.0',
           job: '',
           }, {
@@ -31,14 +27,18 @@ export default {
           salary: '0.5',
           job: '', 
         }],
-        start_date: '',
-        processing_dur: '',
-        review_dur:  '',
-        finish_date: ''
       },
     };
   },
   methods: {
+    handleConfirm() {
+      create(this.projectForm).then(response=>{
+        console.log(response)
+        if (response.status === 200) {
+          this.$router.push({'path': '/project/my_project'})
+        }
+      }) 
+    }
   }
   }
 </script>

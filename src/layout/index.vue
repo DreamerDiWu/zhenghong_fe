@@ -22,6 +22,14 @@ export default {
     Sidebar,
     AppMain
   },
+  mounted() {
+    this.timer = setInterval(()=>{
+      this.pollMessage()
+    }, 60000)
+  },
+  beforeDestroy() {
+    clearInterval(this.timer)
+  },
   mixins: [ResizeMixin],
   computed: {
     sidebar() {
@@ -42,10 +50,18 @@ export default {
       }
     }
   },
+  data() {
+    return {
+      timer: ''
+    }
+  },
   methods: {
     handleClickOutside() {
       this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })
-    }
+    },
+    pollMessage() {
+      this.$store.dispatch('user/getInfo')
+    },
   }
 }
 </script>

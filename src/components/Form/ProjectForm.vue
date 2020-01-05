@@ -2,167 +2,137 @@
 
 <el-form style="margin-top:20px" :model="projectForm" :rules="rules" ref="projectForm" label-width="100px"  class="demo-projectForm">
   <!-- 基础信息 -->
-  <el-form-item label="项目名称" prop="name">
-    <el-input style="width: 500px" v-model="projectForm.name"></el-input>
+  <el-form-item label="项目名称" prop="project_name">
+    <el-input style="width: 500px" v-model="projectForm.project_name"></el-input>
   </el-form-item>
-  <el-form-item style="width: 300px" label="日期" required prop="date">
-    <el-tooltip effect="dark" content="日期格式：年-月-日: 时" placement="right-end">
-        <el-date-picker type="datetime" placeholder="选择项目安排日期" v-model="projectForm.date" style="width: 100%;" format="yyyy-MM-dd HH:00:00" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
-    </el-tooltip>  </el-form-item>
-  <el-row :gutter="20">
-    <el-col :span="6">
-    <el-form-item label="部门" prop="depart" required>
-        <el-select style="width: 120px" v-model="projectForm.depart" placeholder="请选择部门">
-        <el-option value="审计" ></el-option>
-        <el-option value="评估" ></el-option>
-        <el-option value="工程造价" ></el-option>
-        </el-select>
-    </el-form-item>
-    </el-col>
-  <el-col :span="6">
-    <el-form-item label="业务类型" prop="busz_type" :required="true">
-    <el-select v-if="projectForm.depart==''" placeholder="请先选择部门" style="width: 200px">
-    </el-select>
-    <el-select filterable v-if="projectForm.depart=='审计'" style="width: 200px" v-model="projectForm.busz_type" placeholder="请选择业务类型">
-      <el-option value="经责" ></el-option>
-      <el-option value="财务收支" ></el-option>
-      <el-option value="竣工决算" ></el-option>
-      <el-option value="年报" ></el-option>
-      <el-option value="司法会计" ></el-option>
-      <el-option value="咨询服务" ></el-option>
-      <el-option value="其他" ></el-option>
-    </el-select>
-    <el-select filterable v-if="projectForm.depart=='评估'" style="width: 200px" v-model="projectForm.busz_type" placeholder="请选择业务类型">
-      <el-option value="整体资产评估" ></el-option>
-      <el-option value="单项资产评估" ></el-option>
-      <el-option value="无形资产评估" ></el-option>
-      <el-option value="评估鉴定" ></el-option>
-      <el-option value="其他" ></el-option>
-    </el-select> 
-    <el-select filterable v-if="projectForm.depart=='工程造价'" style="width: 200px" v-model="projectForm.busz_type" placeholder="请选择业务类型">
-      <el-option value="预算" ></el-option>
-      <el-option value="结算" ></el-option>
-      <el-option value="工程控制" ></el-option>
-      <el-option value="财政评审" ></el-option>
-      <el-option value="咨询服务" ></el-option>
-      <el-option value="司法鉴定" ></el-option>
-      <el-option value="其他" ></el-option>
-    </el-select> 
-    </el-form-item>
-    </el-col>
-    <el-col v-if="projectForm.busz_type=='其他'" class="line" :span="8">
-      <el-form-item prop="busz_type_extra">
-        <el-input v-model="projectForm.busz_type_extra" placeholder="请输入具体类型" maxlength="10"/>
+  <el-row>
+    <el-col :span="8">
+      <el-form-item style="width: 300px" label="日期" required prop="create_time">
+        <el-tooltip effect="dark" content="日期格式：年-月-日: 时" placement="right-end">
+            <el-date-picker type="datetime" placeholder="选择项目安排日期" v-model="projectForm.create_time" style="width: 100%;" format="yyyy-MM-dd HH:00:00" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+        </el-tooltip>  
       </el-form-item>
     </el-col>
-  </el-row>
-  <!-- <el-row>
-    <el-col :span="8"> 
+    <el-col :span="6"> 
       <el-form-item label="部门-业务类型"  label-position="right" prop="depart" required label-width="120px">
-        <el-cascader :options="departStruct" placeholder="请选择部门和业务类型" v-model="departItem" @change="handleDepartChange">
+        <el-cascader :options="departStruct" placeholder="请选择部门和业务类型" v-model="projectForm.departItem" @change="handleDepartChange">
         </el-cascader>
       </el-form-item>
     </el-col>
-    <el-col :span="8" v-if="departItem[departItem.length-1] == '其他'">
+    <el-col :span="6" v-if="projectForm.departItem[projectForm.departItem.length-1] == '其他'">
       <el-form-item prop="busz_type_extra">
         <el-input v-model="projectForm.busz_type_extra" placeholder="请输入具体类型" maxlength="10"/>
       </el-form-item>    
     </el-col>
-  </el-row> -->
+  </el-row>
+  <!-- 审核配置 -->
+  <el-row>
+    <el-col v-for="(ritem, index) in reviewConfig" :key="index" :span="6">
+      <el-form-item 
+      required
+      :prop="ritem.prop" 
+      :label="ritem.label" >
+      <el-tooltip effect="dark" :content="ritem.tip" placement="right-end">
+        <el-select v-model="projectForm[ritem.prop]" placeholder="请选择">
+          <el-option
+            v-for="(item, index) in ritem.options"
+            :key="index"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-tooltip>  
+      </el-form-item>
+    </el-col>
+  </el-row>
   <!-- 成员配置 -->
   <el-divider content-position="left">项目成员配置</el-divider>
-<el-container style="margin-left:10px">
-  <el-header>
-    <el-dropdown>
-    <el-button type="primary" size="medium">
-        + 添加项目成员<i class="el-icon-arrow-down el-icon--right"></i>
-    </el-button>
-      <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item v-for="r in roles" :key="r" @click.native="handleNew(r)">{{r}}</el-dropdown-item>
-      </el-dropdown-menu>
-    </el-dropdown>
-  </el-header>
-  <el-main>
-    <el-table
-      border
-      :data="projectForm.memberConfigData">
-      <el-table-column type="index" width="30"></el-table-column>
-      <el-table-column
-        label="项目角色"
-        width="140">
-        <template slot-scope="scope">
-          <span style="margin-left: 10px">{{ scope.row.role }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="姓名"
-        width="140">
-        <template slot-scope="scope">
-          <el-input size="mini" v-if="rowOnEdit[scope.$index]" v-model="scope.row.name">{{ scope.row.name }}</el-input>
-          <span v-if="!rowOnEdit[scope.$index]">{{ scope.row.name }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="工时"
-        width="140">
-        <template slot-scope="scope">
-          <el-input-number  
-            size="mini" 
-            v-if="rowOnEdit[scope.$index]" 
-            v-model="scope.row.salary" 
-            :step="0.1" :precision="1" :max="1" :min="0"
-           />
-          <span v-if="!rowOnEdit[scope.$index]">{{ scope.row.salary }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="分工"
-        width="180">
-        <template slot-scope="scope">
-          <el-input size="mini" v-if="rowOnEdit[scope.$index]" v-model="scope.row.job">{{ scope.row.job }}</el-input>
-          <span v-if="!rowOnEdit[scope.$index]">{{ scope.row.job }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作">
-        <template slot-scope="scope">
-          <el-button
-            size="mini"
-            v-if="!rowOnEdit[scope.$index]"
-            @click="handleEdit(scope.$index, scope.row)"
-            :disabled="rowOnEdit.includes(true)">编辑</el-button>
-          <el-button
-            size="mini"
-            type="success"
-            v-if="rowOnEdit[scope.$index]"
-            @click="handleSave(scope.$index, scope.row)">保存</el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            v-if="!rowOnEdit[scope.$index]"
-            :disabled="scope.row.role === '项目负责人' || rowOnEdit.includes(true)"
-            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-          <el-button
-            size="mini"
-            v-if="rowOnEdit[scope.$index]"
-            @click="handleCancel(scope.$index, scope.row)">取消</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-  </el-main>
-</el-container>
+  <el-container style="margin-left:10px">
+    <el-header>
+      <el-dropdown>
+      <el-button type="primary" size="medium">
+          + 添加项目成员<i class="el-icon-arrow-down el-icon--right"></i>
+      </el-button>
+        <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item v-for="r in roles" :key="r" @click.native="handleNew(r)">{{r}}</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+    </el-header>
+    <el-main>
+      <el-table
+        border
+        :data="projectForm.memberConfigData">
+        <el-table-column type="index" width="30"></el-table-column>
+        <el-table-column
+          label="项目角色"
+          prop="role"
+          width="140">
+          <template slot-scope="scope">
+            <span style="margin-left: 10px">{{ scope.row.role }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="姓名"
+          prop="member_user_name"
+          width="140">
+          <template slot-scope="scope">
+            <el-input size="mini" v-if="rowOnEdit[scope.$index]" v-model="scope.row.member_user_name">{{ scope.row.name }}</el-input>
+            <span v-if="!rowOnEdit[scope.$index]">{{ scope.row.member_user_name }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="工时"
+          prop="salary"
+          width="140">
+          <template slot-scope="scope">
+            <el-input-number  
+              size="mini" 
+              v-if="rowOnEdit[scope.$index]" 
+              v-model="scope.row.salary" 
+              :step="0.1" :precision="1" :max="1" :min="0"
+            />
+            <span v-if="!rowOnEdit[scope.$index]">{{ scope.row.salary }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="分工"
+          width="180"
+          prop="job">
+          <template slot-scope="scope">
+            <el-input size="mini" v-if="rowOnEdit[scope.$index]" v-model="scope.row.job">{{ scope.row.job }}</el-input>
+            <span v-if="!rowOnEdit[scope.$index]">{{ scope.row.job }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button
+              size="mini"
+              v-if="!rowOnEdit[scope.$index]"
+              @click="handleEdit(scope.$index, scope.row)"
+              :disabled="rowOnEdit.includes(true)">编辑</el-button>
+            <el-button
+              size="mini"
+              type="success"
+              v-if="rowOnEdit[scope.$index]"
+              @click="handleSave(scope.$index, scope.row)">保存</el-button>
+            <el-button
+              size="mini"
+              type="danger"
+              v-if="!rowOnEdit[scope.$index]"
+              :disabled="scope.row.role === '项目负责人' || rowOnEdit.includes(true)"
+              @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            <el-button
+              size="mini"
+              v-if="rowOnEdit[scope.$index]"
+              @click="handleCancel(scope.$index, scope.row)">取消</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-main>
+  </el-container>
 <!-- 时间安排 -->
   <el-divider content-position="left">计划时间安排</el-divider>
   <el-main>
-    <el-form-item prop="start_date" label="项目开始日期" label-position="left" label-width="120px" required>
-      <el-date-picker
-        v-model="projectForm.start_date"
-        type="date"
-        format="yyyy-MM-dd"
-        value-format="yyyy-MM-dd"
-        :default-value="getDate(projectForm.start_date)"
-        placeholder="选择日期">
-      </el-date-picker>
-    </el-form-item>
     <el-form-item prop="processing_dur" label="项目实施时段" label-position="left" label-width="120px" >
       <el-date-picker
         type="daterange"
@@ -170,6 +140,7 @@
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         v-model="projectForm.processing_dur"
+        value-format="yyyy-MM-dd"
         placeholder="选择日期">
       </el-date-picker>
     </el-form-item>
@@ -179,13 +150,15 @@
         range-separator="至"
         start-placeholder="开始日期"
         end-placeholder="结束日期"
+        value-format="yyyy-MM-dd"
         v-model="projectForm.review_dur"
         placeholder="选择日期">
       </el-date-picker>
     </el-form-item>
-    <el-form-item prop="finish_date" label="项目完成日期" label-position="left" label-width="120px">
+    <el-form-item prop="project_end_time" label="项目完成日期" label-position="left" label-width="120px">
       <el-date-picker
-        v-model="projectForm.finish_date"
+        value-format="yyyy-MM-dd"
+        v-model="projectForm.project_end_time"
         type="date"
         placeholder="与合同委托要求时间一致">
       </el-date-picker>
@@ -254,16 +227,32 @@
             {value: '其他',  label: '其他'},
           ]
         }],
-        departItem: [],
+        reviewConfig: [
+          {prop: 'review_lv1_user_name', label: '一级复核', tip: "项目复核", 
+          options:[
+            {value: "张三", label: "张三"},
+            {value: "罗斯", label: "罗斯"}
+          ]},
+          {prop: 'review_lv2_user_name', label: '二级复核', tip: "底稿整理审核",
+          options:[
+            {value: "张三", label: "张三"},
+            {value: "罗斯", label: "罗斯"}
+          ]},
+          {prop: 'review_lv3_user_name', label: '三级复核', tip: "报告签发",
+          options:[
+            {value: "张三", label: "张三"},
+            {value: "罗斯", label: "罗斯"}
+          ]}
+        ],
         rowOnEdit: [],
         tmpSaveEditRow: '',
         roles: ['实习人员', '助理人员', '复核人员', '报告签发人员'],
         
         rules: {
-          name: [
+          project_name: [
             { required: true, message: '请输入项目名称', trigger: 'blur' }
           ],
-          date: [
+          create_time: [
             {required: true, message: '请选择日期', trigger: 'blur' }
           ],
           depart: [
@@ -284,7 +273,7 @@
           review_dur: [
             {required: true, message: '请选择日期', trigger: 'change'}
           ],
-          finish_date: [
+          project_end_time: [
             {required: true, message: '请选择日期', trigger: 'change'}
           ],
         }
@@ -292,10 +281,10 @@
     },
     methods: {
       handleDepartChange() {
-        if (!this.departItem.length)
+        if (!this.projectForm.departItem.length)
           return 
-        this.projectForm.depart = this.departItem[0]
-        this.projectForm.busz_type = this.departItem[1]
+        this.projectForm.depart = this.projectForm.departItem[0]
+        this.projectForm.busz_type = this.projectForm.departItem[1]
       },
       getDate(strDate) {
         return new Date(this.projectForm.date.replace(/-/g, "/")) 
@@ -333,7 +322,7 @@
       },
       resetForm(formName) {
         this.$refs[formName].resetFields();
-        this.departItem = []
+        this.projectForm.departItem = []
         this.projectForm.busz_type_extra = ''
       },
       handleEdit(index, row) {
