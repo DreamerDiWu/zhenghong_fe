@@ -58,16 +58,22 @@ export default {
         return {
         //详情页对话框
             detailBasicDataCol: [
+                {label: '项目ID', prop: 'project_id'},
                 {label:'项目名称',prop:'project_name'},
                 // {label:'项目进度',prop:'status'},
                 {label:'项目负责人',prop:'owner_user_name'},
                 {label: '部门', prop: 'depart'},
                 {label: '业务类型', prop: 'business'},
-                {label: '是否存档', prop: 'save'},
-                {label: '是否计发工资', prop: 'checkout'},
-                {label:'是否收到款项',prop:'paid'},
+                {label: '合同收款', prop: 'should_charge_amount'},
+                {label: '实施计划', prop: 'description'},
+                {label: '一级复核', prop: 'lv1_review'},
+                {label: '二级复核', prop: 'lv2_review'},
+                {label: '三级复核', prop: 'lv3_review'},
+                {label: '存档', prop: 'save'},
+                {label: '计发工资', prop: 'checkout'},
+                {label:'收款',prop:'charge'},
             ],
-            detailBasicTagItem: ['项目进度', '是否收到款项', '是否计发工资', '是否存档'],
+            detailBasicTagItem: ['项目进度', '收款', '计发工资', '存档','一级复核','二级复核','三级复核'],
             detailMemberDataCol: [
                     {label: '项目角色', prop: 'role'},
                     {label: '名字', prop: 'member_user_name'},
@@ -76,7 +82,6 @@ export default {
             ],
             detailLogDataCol: [
                 {label: '日期', prop: 'create_time'},
-                {label: '填写人', prop: 'member_user_name'},
                 {label: '日志内容', prop: 'content'},
             ],
         }

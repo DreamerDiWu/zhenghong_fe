@@ -11,12 +11,12 @@
     <!-- 查询选项 -->
 
     <el-header height="180px">      
-        <el-row :gutter="20"> 
-          <el-col :span="4">
+        <el-row :gutter="20"  > 
+          <el-col :span="6">
             <el-input style="width: 200px" v-model="filterItem.single.name" placeholder="输入项目名称自动检索"/> 
           </el-col>
           <el-col :span="4">
-            <el-select v-model="filterItem.multiple.status" multiple placeholder="项目进展" clearable >
+            <el-select v-model="filterItem.multiple.status" multiple placeholder="项目状态" clearable >
               <el-option
                 v-for="item in statusOptions"
                 :key="item"
@@ -25,7 +25,7 @@
               </el-option>
             </el-select>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="6">
             <el-cascader 
               :clearable="true"
               :props="{ multiple: true, checkStrictly: true }"
@@ -34,30 +34,13 @@
               @change="calcDepartInfo" 
               placeholder="部门-业务类型"/>
           </el-col>
-          <el-col :span="4">
-            <el-select v-model="filterItem.multiple.paid" multiple placeholder="是否收款" clearable >
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="4" v-for="(item,index) in yesOrNoItem" :key="index">
+            <el-select
+             v-model="filterItem.multiple[item.prop]" multiple :placeholder="item.label" clearable >
               <el-option
-                v-for="item in paidOptions"
-                :key="item"
-                :label="item"
-                :value="item">
-              </el-option>
-            </el-select>
-          </el-col>
-         <el-col :span="4">
-            <el-select v-model="filterItem.multiple.checkout" multiple placeholder="是否计发工资" clearable >
-              <el-option
-                v-for="item in checkoutOptions"
-                :key="item"
-                :label="item"
-                :value="item">
-              </el-option>
-            </el-select>
-          </el-col>
-         <el-col :span="4">
-            <el-select v-model="filterItem.multiple.save" multiple placeholder="是否存档" clearable >
-              <el-option
-                v-for="item in saveOptions"
+                v-for="item in ['是','否']"
                 :key="item"
                 :label="item"
                 :value="item">
@@ -66,7 +49,7 @@
           </el-col>
         </el-row>
         <el-row/>
-            <el-divider content-position="left"></el-divider>
+        <el-divider content-position="left">统计选项</el-divider>
         <el-row>
           <el-col :span="3">
             <el-switch
@@ -85,8 +68,9 @@
               <el-checkbox label="最大值"></el-checkbox>
             </el-checkbox-group>
           </el-col>
-          <el-col v-if="statsOn" :span="6">
+          <el-col v-if="statsOn" :span="10">
              <el-select 
+             style="width:300px"
              v-model="statsIndicator" 
              multiple 
              placeholder="请选择统计指标" 
@@ -101,18 +85,22 @@
             </el-select>           
           </el-col>
         </el-row>
-
       </el-header>
     
     <!-- 表格 -->
-    <el-main>
+    <el-main style="position:relative;margin-top:50px">
       <div class="queryResult">
         <el-table :data="filterResultData" border >
           <el-table-column label="项目名称">
             <template slot-scope="scope">
               <el-tooltip effect="dark" content="点击显示详情" placement="right-end">
-                <el-button type="text" @click="showDetailDialog(scope.$index)">{{scope.row.name}}</el-button>
+                <el-button type="text" @click="showDetailDialog(scope.$index)">{{scope.row.project_name}}</el-button>
               </el-tooltip>
+            </template>
+          </el-table-column>
+          <el-table-column label="项目状态">
+            <template slot-scope="scope">
+              <project-status-tag :scope="scope"></project-status-tag>
             </template>
           </el-table-column>
           <el-table-column v-for="col in tableCols" :label="col.label" :prop="col.prop" :sortable="true">
@@ -135,9 +123,17 @@
 
 <script>
 import ProjectDetailDialog from '../../components/Dialog/ProjectDetailDialog.vue'
+import ProjectStatusTag from '../../components/Tag/ProjectStatusTag.vue'
+import { get_all_project_info } from '@/api/form'
 export default {
   components: {
-    ProjectDetailDialog
+    ProjectDetailDialog,
+    ProjectStatusTag
+  },
+  mounted() {
+    get_all_project_info(this.$store.getters.token).then(response=>{
+      this.rawtableData = response.data
+    })
   },
   computed: {
     filterResultDataCols() {
@@ -150,124 +146,40 @@ export default {
     filterResultData() {
       return this.rawtableData.filter(data=>this.filterData(data))
     },
-    incomeStats() {
-      let statRes = {
-        indicatorName: '项目收入',
-        min: Number.POSITIVE_INFINITY, 
-        minName: '', 
-        max: Number.NEGATIVE_INFINITY, 
-        maxName: '',
-        avg: 0,
-        median: 0,
-        sum: 0
-      }
-      let sortedIncome = this.filterResultData.map(data=>{return data.income}).sort((a, b)=>{return  a > b})
-      const resLength = sortedIncome.length
-      statRes.min = sortedIncome[0]
-      statRes.max = sortedIncome[resLength - 1]
-      let medIndex = Math.floor(resLength / 2)
-      if (resLength % 2 != 0) {
-        statRes.median = sortedIncome[medIndex]
-      } else {
-        statRes.median = (sortedIncome[medIndex] + sortedIncome[medIndex-1]) / 2
-      }
-      sortedIncome.forEach(income=>{statRes.sum += income})
-      statRes.avg = statRes.sum / resLength 
-      return statRes 
-    },
+
     statsResultData() {
       let ret = []
-      if (this.statsIndicator.length > 0 && this.statsType.length > 0) {
-        ret.push(this.incomeStats)      
-      }
+      this.indicatorOptions.forEach(option=>{
+        if (this.statsIndicator.indexOf(option.label) != -1 && this.statsType.length > 0) {
+          ret.push(this.statsValue(option.prop, option.label))      
+        }
+      })
+
       return ret 
     }
   },
   data () {
     return {
-
-// 模拟数据
-// 我的项目表格
-      rawtableData:[
-        {
-          name:'项目1',
-          depart: '审计' ,
-          busz_type: '经责',
-          busz_type_extra: '',
-          status:'实施中',
-          owner:'包大人', 
-          myRole: '项目负责人', 
-          paid:'已收款',
-          income: 200000,
-          checkout: '未计发工资',
-          save: '未存档',
-          date: '2019-09-01 19:00:00',
-          start_date: '2019-10-01',
-          processing_dur: ['2019-11-01', '2019-11-03'],
-          review_dur:  ['2019-11-01', '2019-11-03'],
-          finish_date: '2020-01-01',
-          memberConfigData: [{
-              role: '项目负责人',
-              name: '包大人',
-              salary: '1.0',
-              job: '',
-              }, {
-              role: '项目经理',
-              name: '王小虎',
-              salary: '0.7',
-              job: '',
-              }, {
-              role: '助理人员',
-              name: '王大虎',
-              salary: '0.5',
-              job: '', 
-            }],
-            logs: [
-            {
-              date: '20191106',
-              name: '王小虎',
-              content: '今天送材料'
-            }, 
-            {
-              date: '20191105',
-              name: '包大人',
-              content: '今天准备了材料,今天准备了材料,今天准备了材料,今天准备了材料,今天准备了材料,今天准备了材料'
-            }]
-        },
-        {name:'项目2',status:'复核中',owner:'张龙', myRole: '实习生',paid:'已收款', income: 200000, depart: '审计' ,
-          busz_type: '其他',
-          busz_type_extra: '',           
-          checkout: '已计发工资',
-          save: '已存档',
-          date: '2019-09-01 19:00:00',
-          start_date: '2019-10-01',
-          processing_dur: ['2019-11-01', '2019-11-03'],
-          review_dur:  ['2019-11-01', '2019-11-03'],
-          finish_date: '2020-01-01',},
-        {name:'项目1',status:'已完成',owner:'赵虎', myRole: '项目经理',paid:'未收款',income: 0, depart: '评估' ,
-          busz_type: '其他',
-          busz_type_extra: '',
-          checkout: '未计发工资',
-          save: '未存档',
-          date: '2019-09-01 19:00:00',
-          start_date: '2019-10-01',
-          processing_dur: ['2019-11-01', '2019-11-03'],
-          review_dur:  ['2019-11-01', '2019-11-03'],
-          finish_date: '2020-01-01',},
-      ],
       // 我的项目展示的列名配置
+      rawtableData: [],
       tableCols:[
-        {label: '立项日期', prop: 'date'},
-        {label: '实施日期', prop: 'start_date'},
-        {label: '结束日期', prop: 'finish_date'},
-        {label:'项目进度',prop:'status'},
-        {label:'项目负责人',prop:'owner'},
+        {label: '立项日期', prop: 'create_time'},
+        {label: '实施日期', prop: 'processing_start_time'},
+        {label: '结束日期', prop: 'processing_end_time'},
+        {label: '项目耗时（天）', prop: 'day_passed'},
+        {label: '项目每日工时', prop: 'work_time_per_day'},
+        {label: '项目成本', prop: 'should_checkout_amount'},
+        {label:'项目负责人',prop:'owner_user_name'},
         {label: '部门', prop: 'depart'},
-        {label: '业务类型', prop: 'busz_type'},
-        {label: '是否存档', prop: 'save'},
-        {label: '是否计发工资', prop: 'checkout'},
-        {label:'是否收到款项',prop:'paid'},
-        {label:'项目收入', prop: 'income'}
+        {label: '业务类型', prop: 'business'},
+        {label: '底稿存档', prop: 'save'},
+        {label: '计发工资', prop: 'checkout'},
+        {label:'收款',prop:'charge'},
+        {label:'报告签发',prop:'publish'},
+        {label:'一级复核',prop:'lv1_review'},
+        {label:'二级复核',prop:'lv2_review'},
+        {label:'三级复核',prop:'lv3_review'},
+        {label:'实收款', prop: 'charge_amount'},
       ],
 
       // 部门业务选项
@@ -319,25 +231,37 @@ export default {
         multiple: {
           status: [],
           depart: [],
-          busz_type: [],
-          busz_type_extra: [],
-          paid: [],
+          business: [],
+          charge: [],
+          // lv1_review: [],
+          // lv2_review: [],
+          // lv3_review: [],
           save: [],
+          publish: [],
           checkout: []
         }
       },
+      yesOrNoItem: [
+        {label: '收款', prop: 'charge'},
+        {label: '底稿存档', prop: 'save'},
+        {label: '报告签发', prop: 'publish'},
+        {label: '计发工资', prop: 'checkout'},
+      ],
       checkList: [],
       departItem: [],
-      statusOptions: ['实施中', '复核中', '已完成', '已终止', '底稿整理'],
-      paidOptions: ['已收款', '未收款'],
-      saveOptions: ['已存档', '未存档'],
-      checkoutOptions: ['已计发工资', '未计发工资'],
-
+      statusOptions: ['进行中', '已完结', '已中止', '未开始'],
       // 统计项
       statsOn: true,
       statsType: ['平均值', '最大值', '最小值', '合计', '中位数'],
       statsIndicator: [],
-      statsIndicatorList: ['耗费人工工时', '项目收入', '项目耗时'],
+      statsIndicatorList: ['项目每日工时', '项目收入', '项目耗时', '项目成本'],
+      indicatorOptions: [
+        {label: '项目每日工时', prop: 'work_time_per_day'},
+        {label: '项目应收', prop: 'should_charge_amount'},
+        {label: '项目实收', prop: 'charge_amount'},
+        {label: '项目耗时', prop: 'day_passed'},
+        {label: '项目成本', prop: 'should_checkout_amount'},
+      ],
       // statsResultData: [],
       statsResultDataCols: [
         {prop: 'indicatorName', label: '指标'},
@@ -377,16 +301,15 @@ export default {
     calcDepartInfo() {
       console.log(this.departItem)
       this.filterItem.multiple.depart = []
-      this.filterItem.multiple.busz_type = []
-      this.filterItem.multiple.busz_type_extra = []
+      this.filterItem.multiple.business = []
       this.departItem.forEach(item=>{
         if (item.length == 1) {
           this.filterItem.multiple.depart.push(item[0])
         } else if (item.length == 2) {
           this.filterItem.multiple.depart.push(item[0])
-          this.filterItem.multiple.busz_type.push(item[1])
+          this.filterItem.multiple.business.push(item[1])
         } else if (item.length == 3) {
-          this.filterItem.multiple.busz_type_extra.push(item[2])
+          this.filterItem.multiple.business.push(item[1]+'-'+item[2])
         }
       })
     },
@@ -395,11 +318,42 @@ export default {
       this.detailData = this.rawtableData[index]
       this.detailDialogVisible = true;
     },
+    statsValue(prop, label) {
+      let statRes = {
+        // indicatorName: '项目收入',
+        indicatorName: label,
+        min: Number.POSITIVE_INFINITY, 
+        minName: '', 
+        max: Number.NEGATIVE_INFINITY, 
+        maxName: '',
+        avg: 0,
+        median: 0,
+        sum: 0
+      }
+      let sortedValue = this.filterResultData.map(data=>{return data[prop] ? data[prop]:0}).sort((a, b)=>{return  a > b})
+      const resLength = sortedValue.length
+      statRes.min = sortedValue[0]
+      statRes.max = sortedValue[resLength - 1]
+      let medIndex = Math.floor(resLength / 2)
+      if (resLength % 2 != 0) {
+        statRes.median = sortedValue[medIndex]
+      } else {
+        statRes.median = (sortedValue[medIndex] + sortedValue[medIndex-1]) / 2
+      }
+      sortedValue.forEach(value=>{statRes.sum += value})
+      statRes.avg = statRes.sum / resLength 
+      return statRes 
+    },
   },
 
 }
 </script>
 
 <style>
-
+  .el-row {
+    margin-bottom: 20px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 </style>

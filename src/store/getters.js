@@ -6,7 +6,7 @@ const getters = {
   name: state => state.user.name,
   role: state => state.user.role,
   message: state => state.user.message, 
-  notReadNumber: state => state.user.notReadNumber, 
-  review_event: state => state.user.review_event
+  n_no_read: state => state.user.n_no_read, 
+  transact_orders: state => state.user.transact_orders
 }
 export default getters

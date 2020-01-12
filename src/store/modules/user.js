@@ -1,4 +1,4 @@
-import { login, logout, getInfo, updateEvent } from '@/api/user'
+import { login, logout, get_user_info, read_message} from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -8,8 +8,8 @@ const state = {
   avatar: '',
   role: '',
   message: [],
-  notReadNumber: 0,
-  review_event: []
+  n_no_read: 0,
+  transact_orders: []
 }
 
 const mutations = {
@@ -28,11 +28,11 @@ const mutations = {
   SET_MESSAGE: (state, message) => {
     state.message = message
   },
-  SET_NOTREAD: (state, notReadNumber) => {
-    state.notReadNumber = notReadNumber
+  SET_NOTREAD: (state, n_no_read) => {
+    state.n_no_read = n_no_read
   },
-  SET_REVIEW: (state, review_event) => {
-    state.review_event = review_event
+  SET_TRANSACTION: (state, transact_orders) => {
+    state.transact_orders = transact_orders
   },
 }
 
@@ -55,24 +55,24 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      get_user_info(state.token).then(response => {
         if (!response.data) {
           reject('Verification failed, please Login again.')
         }
-        const { name, avatar, role, message, review_event } = response.data
+        const { name, avatar, role, message, transact_orders } = response.data
 
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         commit('SET_ROLE', role)
         commit('SET_MESSAGE', message)
-        commit('SET_REVIEW', review_event)
-        let notReadNum = 0
+        commit('SET_TRANSACTION', transact_orders)
+        let n_no_read = 0
         
         message.forEach(msg=>{
-          if (msg.status == 'not_read')
-            notReadNum++
+          if (msg.read_ == 0)
+            n_no_read++
         })
-        commit('SET_NOTREAD', notReadNum)
+        commit('SET_NOTREAD', n_no_read)
         resolve(response)
       }).catch(error => {
         reject(error)
@@ -105,15 +105,15 @@ const actions = {
     })
   },
 
-  handleRead({ commit }) {
+  readMessage({ commit }) {
     return new Promise(resolve => {
       commit('SET_NOTREAD', 0)
-      let event_id_batch = []
+      let msg_id_list = []
       state.message.forEach(msg=>{
-        if (msg.status == 'not_read')
-        event_id_batch.push(msg.event_id)
+        if (msg.read_ == 0)
+        msg_id_list.push(msg.message_id)
       })
-      updateEvent(state.token, {event_id: event_id_batch, event_type: 'notice'})
+      read_message(state.token, {message_id: msg_id_list})
       resolve()
     })
   },

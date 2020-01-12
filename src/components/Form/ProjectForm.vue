@@ -1,6 +1,28 @@
 <template>
 
 <el-form style="margin-top:20px" :model="projectForm" :rules="rules" ref="projectForm" label-width="100px"  class="demo-projectForm">
+  <!-- 日志对话框 -->
+  <el-dialog title="填写申请" :visible.sync="orderDialogVisible" append-to-body>
+    <el-form>
+      <el-form-item>
+        <el-select v-model="orderForm.transactor" placeholder="请选择审批人">
+          <el-option
+            v-for="(transactor, index) in transactors"
+            :key="index"
+            :label="transactor.label"
+            :value="transactor.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="orderForm.propose_reason"  type="textarea" placeholder="请输入理由"/>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="proposeOrder">确定</el-button>
+        <el-button type="danger" @click="()=>{orderDialogVisible=false; orderForm={}}">取消</el-button>
+      </el-form-item>
+    </el-form>
+  </el-dialog>  
   <!-- 基础信息 -->
   <el-form-item label="项目名称" prop="project_name">
     <el-input style="width: 500px" v-model="projectForm.project_name"></el-input>
@@ -44,6 +66,11 @@
       </el-tooltip>  
       </el-form-item>
     </el-col>
+  </el-row>
+  <el-row>
+    <el-form-item prop="should_charge_amount" label="合同收款">
+      <el-input  style="width:200px" placeholder="请输入金额（单位元）" v-model="projectForm.should_charge_amount"></el-input>
+    </el-form-item>
   </el-row>
   <!-- 成员配置 -->
   <el-divider content-position="left">项目成员配置</el-divider>
@@ -163,16 +190,21 @@
         placeholder="与合同委托要求时间一致">
       </el-date-picker>
     </el-form-item>
+    <el-form-item prop="description" label="实施计划" label-position="left" label-width="120px">
+      <el-input type="textarea" v-model="projectForm.description" placeholder="请简述实施计划"></el-input>
+    </el-form-item>
   </el-main>
   <!-- 提交按钮 -->
   <el-footer style="margin-left:20px">
     <el-button v-if="!update" type="primary" @click="submitForm('projectForm')">立即创建</el-button>
-    <el-button v-if="update" type="primary" @click="submitUpdateForm('projectForm')">立即更新</el-button>
+    <el-button v-if="update" type="primary" @click="submitUpdateForm('projectForm')">申请修改</el-button>
     <el-button @click="resetForm('projectForm')">重置</el-button>
   </el-footer>
 </el-form>    
 </template>
 <script>
+  import { create_project } from '@/api/form'
+  import { propose_order } from '@/api/order'
   export default {
     props: {
         projectForm: {
@@ -230,24 +262,32 @@
         reviewConfig: [
           {prop: 'review_lv1_user_name', label: '一级复核', tip: "项目复核", 
           options:[
-            {value: "张三", label: "张三"},
-            {value: "罗斯", label: "罗斯"}
+            {value: "super_user", label: "super_user"},
+            {value: "wubiao", label: "吴彪"}
           ]},
           {prop: 'review_lv2_user_name', label: '二级复核', tip: "底稿整理审核",
           options:[
-            {value: "张三", label: "张三"},
-            {value: "罗斯", label: "罗斯"}
+            {value: "super_user", label: "super_user"},
+            {value: "wubiao", label: "吴彪"}
           ]},
           {prop: 'review_lv3_user_name', label: '三级复核', tip: "报告签发",
           options:[
-            {value: "张三", label: "张三"},
-            {value: "罗斯", label: "罗斯"}
+            {value: "super_user", label: "super_user"},
+            {value: "wubiao", label: "吴彪"}
           ]}
         ],
         rowOnEdit: [],
         tmpSaveEditRow: '',
-        roles: ['实习人员', '助理人员', '复核人员', '报告签发人员'],
+        roles: ['实习人员', '助理人员'],
         
+        orderForm: {},
+        orderDialogVisible: false,
+        transactors: [
+          {label: '吴彪', value: 'wubiao'},
+          {label: '肖强', value: 'xiaoqiang'},
+          {label: 'super_user', value: 'super_user'}
+        ],
+
         rules: {
           project_name: [
             { required: true, message: '请输入项目名称', trigger: 'blur' }
@@ -263,6 +303,12 @@
           ],
           busz_type_extra: [
             {required: true, message: '请补充具体业务', trigger: 'blur'}
+          ],
+          should_charge_amount: [
+            {required: true, message: '请选择合同收费', trigger: 'blur'}
+          ],
+          description: [
+            {required: true, message: '请填写实施计划', trigger: 'blur'}
           ],
           start_date: [
             {required: true, message: '请选择日期', trigger: 'change'}
@@ -285,6 +331,7 @@
           return 
         this.projectForm.depart = this.projectForm.departItem[0]
         this.projectForm.busz_type = this.projectForm.departItem[1]
+        console.log("this.projectForm.depart", this.projectForm.depart)
       },
       getDate(strDate) {
         return new Date(this.projectForm.date.replace(/-/g, "/")) 
@@ -295,11 +342,17 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.$message({
-              message: "创建成功",
-              type: 'success'
-            });
-            this.confirmCallBack(0)
+            console.log("this.projectForm", this.projectForm)
+            const token = this.$store.getters.token 
+            create_project(token, this.projectForm).then(response=>{
+              if (response.status === 200) {
+                this.$message({
+                  message: "创建成功",
+                  type: 'success'
+                });
+                this.confirmCallBack(0)
+              }
+            })
           } else {
             this.$message.error('创建失败，请检查后正确填写');
             this.confirmCallBack(1)
@@ -309,13 +362,9 @@
       submitUpdateForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.$message({
-              message: "更新成功",
-              type: 'success'
-            });
-            this.confirmCallBack(0)
+            this.orderDialogVisible = true
           } else {
-            this.$message.error('更新失败，请检查后正确填写');
+            this.$message.error('修改申请失败，请检查后正确填写');
             this.confirmCallBack(1)
           }
         });        
@@ -349,6 +398,29 @@
         this.projectForm.memberConfigData.push(newMember)
         this.handleEdit(this.projectForm.memberConfigData.length-1, newMember)
       },
+      proposeOrder() {
+        console.log("propose:", this.projectForm)
+        propose_order(
+          this.$store.getters.token, 
+          {
+            project_id: this.projectForm.project_id,
+            transactor: this.orderForm.transactor,
+            operation_key: '修改项目信息', 
+            propose_reason: this.orderForm.propose_reason,
+            data: this.projectForm
+          }
+        ).then(response=>{
+          if (response.status === 200) {
+            this.$message({
+              message: "修改申请成功",
+              type: 'success'
+            });
+            this.orderDialogVisible = false 
+            this.orderForm = {}
+            this.confirmCallBack(0)
+          }
+        })
+      }
     }
   }
 </script>

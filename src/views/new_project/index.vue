@@ -3,7 +3,6 @@
 </template>
 <script>
 import ProjectForm from '../../components/Form/ProjectForm.vue'
-import { create } from '@/api/form'
 export default {
   components: {
     ProjectForm
@@ -13,33 +12,31 @@ export default {
       projectForm: {   
         memberConfigData: [{
           role: '项目负责人',
-          name: 'super_user',
+          member_user_name: 'super_user',
           salary: '1.0',
           job: '',
           }, {
           role: '项目经理',
-          name: '王小虎',
+          member_user_name: '王小虎',
           salary: '0.7',
           job: '',
           }, {
           role: '助理人员',
-          name: '王小虎',
+          member_user_name: '王小虎',
           salary: '0.5',
           job: '', 
         }],
+        departItem: []
       },
     };
   },
   methods: {
-    handleConfirm() {
-      create(this.projectForm).then(response=>{
-        console.log(response)
-        if (response.status === 200) {
-          this.$router.push({'path': '/project/my_project'})
-        }
-      }) 
+    handleConfirm(code) {
+      if (code == 0) {
+        this.$router.push({'path': '/project/my_project'})
+      }
     }
   }
-  }
+}
 </script>
 

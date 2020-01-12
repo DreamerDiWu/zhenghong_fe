@@ -24,7 +24,7 @@ export default {
   },
   mounted() {
     this.timer = setInterval(()=>{
-      this.pollMessage()
+      this.getUserMessage()
     }, 60000)
   },
   beforeDestroy() {
@@ -59,7 +59,7 @@ export default {
     handleClickOutside() {
       this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })
     },
-    pollMessage() {
+    getUserMessage() {
       this.$store.dispatch('user/getInfo')
     },
   }

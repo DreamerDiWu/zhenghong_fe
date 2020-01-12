@@ -9,7 +9,7 @@ export function login(data) {
   })
 }
 
-export function getInfo(token) {
+export function get_user_info(token) {
   return request({
     url: 'http://localhost:8889/user/info',
     method: 'get',
@@ -17,20 +17,19 @@ export function getInfo(token) {
   })
 }
 
-
-export function updateEvent(token, params) {
-  console.log(params)
+export function get_transact_order(token) {
   return request({
-    url: 'http://localhost:8889/user/update_event?token=' + token,
-    method: 'post',
-    data: params
+    url: 'http://localhost:8889/user/get_transact_order',
+    method: 'get',
+    params: { token }
   })
 }
 
-export function pullReview(token) {
+export function read_message(token, data) {
   return request({
-    url: 'http://localhost:8889/user/pull_review?token=' + token,
-    method: 'get',
+    url: 'http://localhost:8889/user/read_message?token=' + token,
+    method: 'post',
+    data: data
   })
 }
 
