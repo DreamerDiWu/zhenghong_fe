@@ -42,7 +42,8 @@ export const constantRoutes = [
     component: () => import('@/views/404'),
     hidden: true
   },
-
+]
+export const asyncRoutes = [ 
   {
     path: '/',
     component: Layout,
@@ -51,29 +52,29 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: '首页', icon: 'dashboard' }
     }]
   },
   {
     path: '/project',
-    component: Layout,
+    component: Layout, 
     redirect: '/project/my_project',
     name: '项目管理',
-    meta: { title: '项目管理', icon: 'example' },
+    meta: { title: '项目管理', icon: 'example', roles: ['employee', 'super_user'] },
     children: [
-      {
-        path: 'my_project',
-        name: '我的项目',
-        component: () => import('@/views/my_project/index'),
-        meta: { title: '我的项目', icon: 'table' },
-
-      },
       {
         path: 'new_project',
         name: '立项',
         component: () => import('@/views/new_project/index'),
-        meta: { title: '立项', icon: 'tree' }
-      }
+        meta: { title: '立项', icon: 'tree'}
+      },
+      {
+        path: 'my_project',
+        name: '我的项目',
+        component: () => import('@/views/my_project/index'),
+        meta: { title: '我的项目', icon: 'table'},
+
+      },
     ]
   },
 
@@ -85,7 +86,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'Query',
         component: () => import('@/views/query/index'),
-        meta: { title: '查询', icon: 'eye-open' }
+        meta: { title: '查询', icon: 'eye-open', roles: ['super_user', 'wubiao'] }
       }
     ]
   },
@@ -97,7 +98,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'Review',
         component: () => import('@/views/review/index'),
-        meta: { title: '我的审核', icon: 'form' }
+        meta: { title: '我的审核', icon: 'form', roles: ['super_user', 'wubiao'] }
       }
     ]
 
