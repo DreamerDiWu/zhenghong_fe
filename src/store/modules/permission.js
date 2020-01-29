@@ -26,12 +26,10 @@ export function filterAsyncRoutes(routes, roles) {
   routes.forEach(route => {
     const tmp = { ...route }
     if (hasPermission(roles, tmp)) {
-      console.log("inner", roles, tmp)
       if (tmp.children) {
         tmp.children = filterAsyncRoutes(tmp.children, roles)
       }
       res.push(tmp)
-      console.log("res.push(", tmp, ")")
     }
   })
   return res
