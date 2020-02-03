@@ -32,7 +32,6 @@ export default {
       'permission_routes'
     ]),
     activeMenu() {
-      console.log("permission_routes = ", this.$store.getters.permission_routes)
       const route = this.$route
       const { meta, path } = route
       // if set path, the sidebar will highlight the path you set

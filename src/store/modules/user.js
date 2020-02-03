@@ -97,7 +97,6 @@ const actions = {
 
   // remove token
   resetToken({ commit }) {
-    console.log('resetToken')
     return new Promise(resolve => {
       commit('SET_TOKEN', '')
       removeToken()

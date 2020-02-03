@@ -1,5 +1,16 @@
 <template>
   <div class="login-container" :style="bg">
+    <el-dialog :visible="formVisible" @close="handleClose" append-to-body width="30%">
+      <el-form>
+        <el-form-item label="邮箱" prop="mail">
+          <el-input style="width:300px" v-model="valid_mail"  placeholder="请输入登录邮箱"/>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" :loading="validLoading" @click="handleSubmit">提交</el-button>
+          <el-button type="danger" @click="handleClose">取消</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>   
     <el-form 
     ref="loginForm" 
     :model="loginForm" 
@@ -48,14 +59,15 @@
       </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
-
+      <el-button style="margin-left: 180px; margin-top:-1000px" type="text" @click="()=>{formVisible=true}">忘记密码？</el-button>
     </el-form>
   </div>
 </template>
 
 <script>
 import { validUsername } from '@/utils/validate'
-import bgImg from '../../assets/404_images/loginv2.png'
+import { send_valid_link } from '@/api/user'
+import bgImg from '../../assets/404_images/loginv2_1024.png'
 export default {
   name: 'Login',
   data() {
@@ -91,7 +103,10 @@ export default {
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      redirect: undefined,
+      valid_mail: '',
+      formVisible: false,
+      validLoading: false,
     }
   },
   watch: {
@@ -124,10 +139,18 @@ export default {
             this.loading = false
           })
         } else {
-          console.log('error submit!!')
           return false
         }
       })
+    }, 
+    handleSubmit() {
+      this.$message.success('验证链接会在一分钟内发送至您的邮箱，请注意查收')
+      send_valid_link({'valid_mail': this.valid_mail})
+      this.handleClose()
+    },
+    handleClose() {
+      this.formVisible = false 
+      this.valid_mail = ''
     }
   }
 }

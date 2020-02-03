@@ -6,7 +6,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import bgImg from '../../assets/404_images/welcome.png'
+import bgImg from '../../assets/404_images/welcome_1024.png'
 export default {
   name: 'Dashboard',
   computed: {
@@ -23,11 +23,10 @@ export default {
         position:'fixed',
         top: 30,
         left: 0,
-        // width:'100%',
-        // height:'100%',
+        // width:'50%',
+        // height:'50%',
         // minWidth: '1000px',
         // zIndex:-10,
-        // zoom: 1,
         // backgroundRepeat: no-repeat,
         backgroundPosition: 'center 0',
       } 

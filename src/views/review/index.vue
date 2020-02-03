@@ -46,7 +46,7 @@
          :key="index"
          :prop="col.prop">
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="200">
           <template slot-scope="scope">
               <el-button 
               v-for="(hdl, index) in handler" 
@@ -64,7 +64,12 @@
         </el-table-column>
       </el-table>
       <el-divider content-position="left">已审核的项目</el-divider>
-      <el-table empty-text="暂无数据" :data="reviewedData.filter(data => !filterName || data.project_name.includes(filterName))" border>
+      <el-table 
+      empty-text="暂无数据" 
+      :data="reviewedData.filter(data => !filterName || data.project_name.includes(filterName))" 
+      border
+      max-height="300"
+      >
         <el-table-column label="项目名称">
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="点击显示详情" placement="right-end">
@@ -113,7 +118,7 @@ export default {
         {label:'详情', prop:'propose_reason'},
         {label: '审批状态', prop: 'status'},
         {label: '审批结果', prop: 'transact_result'},
-        {label:'审批申请人',prop:'proposer'},
+        {label:'申请人',prop:'proposer_chi_name'},
       ],
 
       // 项目名称模糊查找
@@ -153,6 +158,7 @@ export default {
           }
         })      
       })
+      console.log(this.toReviewData)
     },
     transact() {
       const token = this.$store.getters.token 
@@ -172,5 +178,8 @@ export default {
 </script>
 
 <style>
-
+.el-table .cell {
+    /*text-align: center;*/
+    white-space: pre-line;/*保留换行符*/
+}
 </style>

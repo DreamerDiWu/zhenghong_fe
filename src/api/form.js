@@ -1,7 +1,6 @@
 import request from '@/utils/request'
 // prefix: http://localhost:8889
 export function create_project(token, form) {
-  console.log("form=", form)
   return request({
     url: '/form/create_project?token=' + token, 
     method: 'post',
@@ -11,7 +10,6 @@ export function create_project(token, form) {
 
 // 'project_id', 'content', 'create_time'
 export function create_project_log(token, form) {
-  console.log(form)
   return request({
     url: '/form/create_project_log?token=' + token, 
     method: 'post',
@@ -34,9 +32,9 @@ export function get_project_info(params) {
   })
 }
 
-export function get_all_project_info(token) {
+export function get_auth_project_info(token) {
   return request({
-    url: '/form/get_all_project_info?token='+ token,
+    url: '/form/get_auth_project_info?token='+ token,
     method: 'get'
   })
 }

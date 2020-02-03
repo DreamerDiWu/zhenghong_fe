@@ -42,6 +42,11 @@ export const constantRoutes = [
     component: () => import('@/views/404'),
     hidden: true
   },
+  {
+    path: '/forget',
+    component: () => import('@/views/forget'),
+    hidden: true
+  }
 ]
 export const asyncRoutes = [ 
   {
@@ -60,7 +65,7 @@ export const asyncRoutes = [
     component: Layout, 
     redirect: '/project/my_project',
     name: '项目管理',
-    meta: { title: '项目管理', icon: 'example', roles: ['employee', 'super_user'] },
+    meta: { title: '项目管理', icon: 'example', roles: ['项目经理', '助理', '部门经理', '管理员'] },
     children: [
       {
         path: 'new_project',
@@ -86,7 +91,7 @@ export const asyncRoutes = [
         path: 'index',
         name: 'Query',
         component: () => import('@/views/query/index'),
-        meta: { title: '查询', icon: 'eye-open', roles: ['super_user', 'wubiao'] }
+        meta: { title: '查询', icon: 'eye-open', roles: ['主任会计师', '副主任会计师', '部门经理', '管理员'] }
       }
     ]
   },
@@ -98,7 +103,7 @@ export const asyncRoutes = [
         path: 'index',
         name: 'Review',
         component: () => import('@/views/review/index'),
-        meta: { title: '我的审核', icon: 'form', roles: ['super_user', 'wubiao'] }
+        meta: { title: '我的审核', icon: 'form', roles: ['主任会计师', '副主任会计师', '部门经理', '技术负责人', '行政助理', '管理员'] }
       }
     ]
 

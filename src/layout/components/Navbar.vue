@@ -1,11 +1,8 @@
 <template>
   <div class="navbar">
-    <!-- 详情页对话框 -->
-    <!-- <project-detail-dialog 
-      :detailData="detailData" 
-      :detailDialogVisible="detailDialogVisible"
-      :closeCallBack="()=>{this.detailDialogVisible = false}">
-    </project-detail-dialog> -->
+    <el-dialog :visible="passDialogVisible" @close="handleClose" append-to-body width="50%">
+      <password-form :submitCallback="submitForm"></password-form>
+    </el-dialog>   
     <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
     <breadcrumb class="breadcrumb-container" />
     <div class="right-menu">     
@@ -22,7 +19,7 @@
                     <el-tag type="warning">{{scope.row.operation_key}}</el-tag>
                     <span style="float:right">{{scope.row.create_time}}</span>
                   </div>
-                  <span>{{scope.row.proposer}} : {{scope.row.propose_reason}}</span>
+                  <span>{{scope.row.proposer_chi_name}} : {{scope.row.propose_reason}}</span>
                   <el-button type="text" style="float:right" @click="gotoReview">点这里去审核</el-button>
                 </el-card>
               </template>
@@ -47,7 +44,6 @@
                     <span style="float:right">{{scope.row.create_time}}</span>
                   </div>
                   <span>{{scope.row.content}}</span>
-                  <el-button type="text" style="float:right" @click="()=>{this.$message('未实现')}">点这里查看详情</el-button>
                 </el-card>
               </template>
             </el-table-column>
@@ -64,6 +60,9 @@
             </el-dropdown-item>
           </router-link>
           <el-dropdown-item divided>
+            <span style="display:block;" @click="()=>{this.passDialogVisible=true}">修改密码</span>
+          </el-dropdown-item>
+          <el-dropdown-item divided>
             <span style="display:block;" @click="logout">登出</span>
           </el-dropdown-item>
         </el-dropdown-menu>
@@ -74,14 +73,17 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { reset_password } from '@/api/user'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import passwordForm from '../../components/Form/passwordForm.vue'
 import ProjectDetailDialog from '../../components/Dialog/ProjectDetailDialog.vue'
 export default {
   components: {
     Breadcrumb,
     Hamburger,
-    ProjectDetailDialog
+    ProjectDetailDialog,
+    passwordForm
   },
   computed: {
     ...mapGetters([
@@ -93,10 +95,42 @@ export default {
     ]),
   },
   data() {
+    var valid_raw = (rule, value, callback) => {
+      if (value == '') {
+        callback(new Error('请输入新密码'))
+      }
+      if (value.length < 6) {
+        callback(new Error('密码长度不能少于6位'))
+      }
+      callback()
+    };
+		var valid_repeat = (rule, value, callback) => {
+			if (value == '') {
+					callback(new Error('请重复新密码'))
+			} else {
+					if (this.ruleForm.new_password != value) {
+							callback(new Error('两次输入密码不一致'))
+					}
+			}
+			callback()
+		};
     return {
             //详情页对话框
       detailDialogVisible: false,
       detailData: {},
+      passDialogVisible: false,
+      ruleForm: {
+				new_password: '',
+				repeat_password: ''
+			},
+			rules: {
+				new_password: [
+						{required: true, trigger: 'blur', validator: valid_raw}
+				],
+				repeat_password: [
+						{required:true, trigger: 'blur', validator: valid_repeat}
+				]
+			},
     }
   },
   methods: {
@@ -116,16 +150,27 @@ export default {
     },
     async logout() {
       await this.$store.dispatch('user/logout')
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      this.$router.push(`/login`)
     },
     readMessage() {
       this.$store.dispatch('user/readMessage')
     },
     flushUserInfo() {
       this.$store.dispatch('user/getInfo')
-      console.log("this.transact_orders", this.transact_orders)
     },
-
+		submitForm(ruleForm) {
+      reset_password(this.$store.getters.token, {'new_password': ruleForm.new_password}).then(response=>{
+        if (response.status==200){
+          this.$message.success('重置密码成功')
+          this.handleClose()
+        } else {
+          this.$message.error('重置密码失败')
+        }
+      })
+		},
+    handleClose() {
+      this.passDialogVisible = false;
+    }
   }
 }
 </script>

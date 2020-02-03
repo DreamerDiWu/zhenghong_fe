@@ -10,12 +10,15 @@
 
     <!-- 查询选项 -->
 
-    <el-header height="180px">      
+    <el-header height="100%">      
         <el-row :gutter="20"  > 
           <el-col :span="6">
-            <el-input style="width: 200px" v-model="filterItem.single.name" placeholder="输入项目名称自动检索"/> 
+            <el-input style="width: 200px" v-model="filterItem.single.project_name" placeholder="输入项目名称自动检索"/> 
           </el-col>
-          <el-col :span="4">
+          <el-col :span="6">
+            <el-input style="width: 200px" v-model="filterItem.single.owner_chi_name" placeholder="输入组长名称自动检索"/> 
+          </el-col>
+          <el-col :span="6">
             <el-select v-model="filterItem.multiple.status" multiple placeholder="项目状态" clearable >
               <el-option
                 v-for="item in statusOptions"
@@ -36,7 +39,7 @@
           </el-col>
         </el-row>
         <el-row :gutter="20">
-          <el-col :span="4" v-for="(item,index) in yesOrNoItem" :key="index">
+          <el-col :span="6" v-for="(item,index) in yesOrNoItem" :key="index">
             <el-select
              v-model="filterItem.multiple[item.prop]" multiple :placeholder="item.label" clearable >
               <el-option
@@ -124,14 +127,14 @@
 <script>
 import ProjectDetailDialog from '../../components/Dialog/ProjectDetailDialog.vue'
 import ProjectStatusTag from '../../components/Tag/ProjectStatusTag.vue'
-import { get_all_project_info } from '@/api/form'
+import { get_auth_project_info } from '@/api/form'
 export default {
   components: {
     ProjectDetailDialog,
     ProjectStatusTag
   },
   mounted() {
-    get_all_project_info(this.$store.getters.token).then(response=>{
+    get_auth_project_info(this.$store.getters.token).then(response=>{
       this.rawtableData = response.data
     })
   },
@@ -169,17 +172,18 @@ export default {
         {label: '项目耗时（天）', prop: 'day_passed'},
         {label: '项目每日工时', prop: 'work_time_per_day'},
         {label: '项目成本', prop: 'should_checkout_amount'},
-        {label:'项目负责人',prop:'owner_user_name'},
+        {label:'项目组长',prop:'owner_chi_name'},
         {label: '部门', prop: 'depart'},
         {label: '业务类型', prop: 'business'},
         {label: '底稿存档', prop: 'save'},
-        {label: '计发工资', prop: 'checkout'},
-        {label:'收款',prop:'charge'},
-        {label:'报告签发',prop:'publish'},
+        {label: '工资计发', prop: 'checkout'},
+        {label:'收款确认',prop:'charge'},
+        {label:'报告制作',prop:'publish'},
         {label:'一级复核',prop:'lv1_review'},
         {label:'二级复核',prop:'lv2_review'},
         {label:'三级复核',prop:'lv3_review'},
-        {label:'实收款', prop: 'charge_amount'},
+        {label:'收款金额', prop: 'charge_amount'},
+        {label:'工资计发金额', prop: 'checkout_amount'},
       ],
 
       // 部门业务选项
@@ -223,7 +227,8 @@ export default {
       // 项目筛选项
       filterItem: {
         single: {
-          name: '',
+          project_name: '',
+          owner_chi_name: '',
           // checkout: '',
           // paid: '',
           // save: '', 
@@ -244,7 +249,7 @@ export default {
       yesOrNoItem: [
         {label: '收款', prop: 'charge'},
         {label: '底稿存档', prop: 'save'},
-        {label: '报告签发', prop: 'publish'},
+        {label: '报告制作', prop: 'publish'},
         {label: '计发工资', prop: 'checkout'},
       ],
       checkList: [],
@@ -299,7 +304,6 @@ export default {
 
     },
     calcDepartInfo() {
-      console.log(this.departItem)
       this.filterItem.multiple.depart = []
       this.filterItem.multiple.business = []
       this.departItem.forEach(item=>{

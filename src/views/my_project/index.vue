@@ -1,5 +1,82 @@
 <template>
   <el-container style="width:100%; margin-top:50px">
+    <!-- 申请普通填写表 -->
+    <order-form 
+    :append="true" 
+    :orderFormVisible="orderFormVisible" 
+    :transactors="transactors"
+    :closeCallBack="()=>{orderFormVisible=false; orderOperationKey=''; currProjectId=''}"
+    :submitCallBack="(orderForm)=>{
+      proposeOrder(currProjectId,orderForm.transactor, orderOperationKey,orderForm.propose_reason,{})
+      this.currProjectId = ''
+      this.orderOperationKey = ''
+      this.orderFormVisible = false;
+    }"
+    ></order-form>
+    <publish-form
+      :publishFormVisible="publishFormVisible"
+      :transactors="transactors"
+      :closeCallBack="()=>{publishFormVisible=false; currProjectId=''}"
+      :submitCallBack="(publishData)=>{
+        proposeOrder(
+          currProjectId, 
+          publishData.transactor, 
+          '报告制作', 
+          ['报告编号:'+publishData.publish_id, '制作时间:'+publishData.publish_time, '报告份数:'+publishData.publish_copy].join('\n'), 
+          publishData
+        )
+        currProjectId = ''
+        publishFormVisible = false  
+      }"
+    ></publish-form>
+    <charge-form
+      :chargeFormVisible="chargeFormVisible"
+      :transactors="transactors"
+      :closeCallBack="()=>{chargeFormVisible=false; currProjectId=''}"
+      :submitCallBack="(chargeData)=>{
+        proposeOrder(
+          currProjectId, 
+          chargeData.transactor, 
+          '收款确认', 
+          ['收款金额:'+chargeData.charge_amount, '收款时间:'+chargeData.charge_time].join('\n'),
+          chargeData
+        )
+        currProjectId = ''
+        chargeFormVisible = false  
+      }"
+    ></charge-form>
+    <save-form
+      :saveFormVisible="saveFormVisible"
+      :transactors="transactors"
+      :closeCallBack="()=>{saveFormVisible=false; currProjectId=''}"
+      :submitCallBack="(saveData)=>{
+        proposeOrder(
+          currProjectId, 
+          saveData.transactor, 
+          '底稿存档', 
+          ['存档编号:'+saveData.save_id, '存档时间:'+saveData.save_time].join('\n'),
+          saveData
+        )
+        currProjectId = ''
+        saveFormVisible = false  
+      }" 
+    ></save-form>
+    <checkout-form
+      :checkoutFormVisible="checkoutFormVisible"
+      :transactors="transactors"
+      :closeCallBack="()=>{checkoutFormVisible=false; currProjectId=''}"
+      :submitCallBack="(checkoutData)=>{
+        proposeOrder(
+          currProjectId, 
+          checkoutData.transactor, 
+          '工资计发', 
+          ['计发金额:'+checkoutData.checkout_amount, '计发时间:'+checkoutData.checkout_time, '计发明细:'+checkoutData.checkout_detail].join('\n'),
+          checkoutData
+        )
+        currProjectId = ''
+        checkoutFormVisible = false  
+      }" >
+    </checkout-form>
     <!-- 日志对话框 -->
       <el-dialog title="录入日志" :visible.sync="logDialogVisible">
         <el-form>
@@ -26,7 +103,7 @@
         <project-form 
         :projectForm="editDialogData" 
         :update="true" 
-        :confirmCallBack="retcode=>{
+        :confirmCallBack="(retcode)=>{
           if(retcode == 0) {
             this.editDialogVisible=false
             this.flushProjectInfo()
@@ -58,7 +135,8 @@
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-dropdown>
-              <el-button icon="el-icon-s-tools" type="primary">
+              <el-button icon="el-icon-s-tools" type="primary" 
+              :disabled="scope.row.status == '已中止' || scope.row.status == '已完结'">
                 管理
               </el-button>
               <el-dropdown-menu slot="dropdown">
@@ -80,17 +158,27 @@
 
 <script>
 import ProjectForm from '../../components/Form/ProjectForm.vue'
+import OrderForm from '../../components/Form/OrderForm.vue'
+import ChargeForm from '../../components/Form/ChargeForm.vue'
+import SaveForm from '../../components/Form/SaveForm.vue'
+import CheckoutForm from '../../components/Form/CheckoutForm.vue'
+import PublishForm from '../../components/Form/PublishForm.vue'
 import ProjectDetailDialog from '../../components/Dialog/ProjectDetailDialog.vue'
 import ProjectStatusTag from '../../components/Tag/ProjectStatusTag.vue'
 import { get_user_project_info, get_project_info, create_project_log } from '@/api/form'
-import { propose_order } from '@/api/user'
+import { propose_order } from '@/api/order'
 import { getToken } from '@/utils/auth'
 
 export default {
   components: {
     ProjectForm,
     ProjectDetailDialog,
-    ProjectStatusTag
+    ProjectStatusTag,
+    OrderForm,
+    PublishForm,
+    ChargeForm,
+    SaveForm,
+    CheckoutForm
   },
   computed: {
   },
@@ -99,7 +187,6 @@ export default {
       const {data, status} = response
       console.log(response)
       this.rawtableData = data 
-      console.log(Object.keys(this.rawtableData[0]))
     })
   },
   data () {
@@ -110,40 +197,137 @@ export default {
       ],
       // 项目名称模糊查找
       filterName: '',
+
+      // 项目指针
+      currProjectId: '',
       // 录入日志对话框
       logDialogVisible: false,
       logContent: '',
       logTime: '',
-      currProjectId: '',
-
+      
+      transactors: [
+        {label: '刘星', value: '103530090@qq.com'},
+        {label: '陈锐', value: '11844971@qq.com'},
+        {label: '徐露耘', value: '2334098655@qq.com'}
+      ],
       // 管理选项
       manageHandler: [
         {
-          label: '修改', 
+          label: '修改项目信息', 
           handle: row=>{this.showEditDialog(row)}, 
-          disable: row=>{
-            let flag = false 
-            row.orders.forEach(order => {
-              if (order.operation_key=='修改项目信息' && order.status=='审批中') {
-                flag = true 
-              } 
-            });
-            return flag  
-          }
+          disable: row=>{return row.status == '已暂停' || this.hasOrderStatus(row, '修改项目信息', '审批中')}
         },
-        {label: '申请一级复核', handle: row=>{this.applyl1Review(row)}, disable: row=>{return row.status!='进行中'}},
-        {label: '申请二级复核', handle: row=>{this.applyL2Review(row)}, disable: row=>{return row.status!='一级复核通过'}},
-        {label: '申请三级复核', handle: row=>{this.applyL3Review(row)}, disable: row=>{return row.status!='二级复核通过'}},
-        {label: '终止', handle: row=>{this.applyStop(row)}, disable: row=>{return false}},
-        {label: '录入日志', handle: row=>{ this.currProjectId = row.project_id; this.logDialogVisible = true;}, disable: row=>{return false}}
+        {
+          label: '申请一级复核', 
+          handle: row=>{this.proposeStatusChange(row.project_id, row.review_lv1_user_name, '一级复核')}, 
+          disable: row=>{return row.status == '已暂停' || this.hasOrderStatus(row, '一级复核', '审批中') || row.lv1_review == "是" }
+        },
+        {
+          label: '申请二级复核', 
+          handle: row=>{this.proposeStatusChange(row.project_id, row.review_lv2_user_name, '二级复核')}, 
+          disable: row=>{return row.status == '已暂停' || this.hasOrderStatus(row, '二级复核', '审批中') || row.lv2_review == "是" || row.lv1_review != "是"}
+        },
+        {
+          label: '申请三级复核', 
+          handle: row=>{this.proposeStatusChange(row.project_id, row.review_lv3_user_name, '三级复核')}, 
+          disable: row=>{return row.status == '已暂停' || this.hasOrderStatus(row, '三级复核', '审批中') || row.lv3_review == "是" || row.lv2_review != "是" || row.lv1_review != "是"}
+        },
+        {
+          label: '报告制作', 
+          handle: row=>{
+            this.publishFormVisible = true;
+            this.currProjectId = row.project_id
+          }, 
+          disable: row=>{return (row.status == '已暂停' || row.lv3_review != "是" || row.publish == '是')}
+        },
+        {
+          label: '收款确认', 
+          handle: row=>{
+            this.chargeFormVisible = true;
+            this.currProjectId = row.project_id
+          }, 
+          disable: row=>{return (row.status == '已暂停' || row.lv3_review != "是" || row.charge == '是')}
+        },
+        {
+          label: '底稿存档', 
+          handle: row=>{
+            this.saveFormVisible = true;
+            this.currProjectId = row.project_id
+          }, 
+          disable: row=>{return (row.status == '已暂停' || row.lv3_review != "是" || row.save == '是')}
+        },
+        {
+          label: '工资计发', 
+          handle: row=>{
+            this.checkoutFormVisible = true;
+            this.currProjectId = row.project_id
+          }, 
+          disable: row=>{return (row.status == '已暂停' || row.charge != "是" || row.checkout == '是')}
+        },
+        {
+          label: '中止项目', 
+          handle: row=>{
+            this.orderFormVisible = true;
+            this.orderOperationKey = '中止项目';
+            this.currProjectId = row.project_id
+          }, 
+          disable: row=>{return false}
+        },
+        {
+          label: '暂停项目', 
+          handle: row=>{
+            this.orderFormVisible = true;
+            this.orderOperationKey = '暂停项目';
+            this.currProjectId = row.project_id
+          }, 
+          disable: row=>{return row.status == '已暂停'}
+        },
+        {
+          label: '恢复项目', 
+          handle: row=>{
+            this.orderFormVisible = true;
+            this.orderOperationKey = '恢复项目';
+            this.currProjectId = row.project_id
+          }, 
+          disable: row=>{return row.status != '已暂停'}
+        },
+        {
+          label: '完结项目', 
+          handle: row=>{
+            this.orderFormVisible = true;
+            this.orderOperationKey = '完结项目';
+            this.currProjectId = row.project_id
+          }, 
+          disable: row=>{return row.status == '已暂停' || row.checkout != '是'}
+        },
+        {
+          label: '录入日志', 
+          handle: row=>{ 
+            this.currProjectId = row.project_id; this.logDialogVisible = true;
+          }, 
+          disable: row=>{return row.status == '已暂停'}
+        },
       ],
+
       //详情页对话框
       detailDialogVisible: false,
       detailData: {},
-
+      // 报告制作填报
+      publishFormVisible: false,
+      // 底稿存档填报
+      saveFormVisible: false,
+      // 收款填报
+      chargeFormVisible: false,
+      // 计发工资填报
+      checkoutFormVisible: false,
       // 修改页对话框
       editDialogVisible: false,
-      editDialogData: {}
+      editDialogData: {},
+
+      //申请表
+      orderFormVisible: false,
+      orderOperationKey: ''
+
     }
   },
   methods: {
@@ -154,7 +338,6 @@ export default {
       const project_id = this.rawtableData[index].project_id
       get_project_info({project_id: project_id}).then(response=>{
         this.detailData = response.data[0]
-        console.log("detailData", this.detailData)
       })      
       this.detailDialogVisible = true;
     },
@@ -165,42 +348,8 @@ export default {
       })
       this.editDialogVisible = true;
     },
-    applyL1Review(row) {
-      const token = getToken()
-      propose_order(token, {
-        event_class: 'review',
-        event_type: '一级审核',
-        // transactor: row.${some reviewer} 
-        transactor: 'super_user',
-        project_id: row.project_id
-      })
-      pull_detail({project_id: row.project_id, get_member_info:false, get_log_info:false})
-    },
-    applyL2Review(row) {
-      const token = getToken()
-      propose_order(token, {
-        event_class: 'review',
-        event_type: '二级审核',
-        // transactor: row.${some reviewer} 
-        transactor: 'super_user',
-        project_id: row.project_id
-      })
-      pull_detail({project_id: row.project_id, get_member_info:false, get_log_info:false})
-    },
-    applyL3Review(row) {
-      const token = getToken()
-      propose_order(token, {
-        event_class: 'review',
-        event_type: '三级审核',
-        // transactor: row.${some reviewer} 
-        transactor: 'super_user',
-        project_id: row.project_id
-      })
-      pull_detail({project_id: row.project_id, get_member_info:false, get_log_info:false})
-    },
     commitLog() {
       const token = getToken()
-      console.log(this.currProjectId)
       create_project_log(token, {
         project_id: this.currProjectId,
         content: this.logContent,
@@ -217,6 +366,40 @@ export default {
         const {data, status} = response
         this.rawtableData = data 
       })
+    },
+    proposeOrder(project_id, transactor, operation_key, propose_reason, data) {
+      propose_order(
+        this.$store.getters.token, 
+        {
+          project_id: project_id,
+          transactor: transactor,
+          operation_key: operation_key, 
+          propose_reason: propose_reason,
+          data: data
+        }
+      ).then(response=>{
+        if (response.status === 200) {
+          this.$message({
+            message: operation_key + "申请已发送",
+            type: 'success'
+          });
+          this.orderDialogVisible = false 
+          this.orderForm = {}
+          this.flushProjectInfo()
+        }
+      })
+    },
+    proposeStatusChange(project_id, transactor, operation_key) {
+      this.proposeOrder(project_id, transactor, operation_key, '', {})
+    },
+    hasOrderStatus(row, operation_key, status) {
+      let flag = false 
+      row.orders.forEach(order => {
+        if (order.operation_key==operation_key && order.status==status) {
+          flag = true 
+        } 
+      });
+      return flag  
     },
   },
 }

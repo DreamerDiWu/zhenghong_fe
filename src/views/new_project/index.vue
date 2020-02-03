@@ -9,23 +9,17 @@ export default {
   },
   data() {
     return {
-      projectForm: {   
-        memberConfigData: [{
-          role: '项目负责人',
-          member_user_name: 'super_user',
+      projectForm: { 
+        review_lv2_user_name: '',
+        review_lv3_user_name: '',
+        memberConfigData: [
+          {
+          role: '项目组长',
+          member_user_name: this.$store.getters.name,
           salary: '1.0',
           job: '',
-          }, {
-          role: '项目经理',
-          member_user_name: '王小虎',
-          salary: '0.7',
-          job: '',
-          }, {
-          role: '助理人员',
-          member_user_name: '王小虎',
-          salary: '0.5',
-          job: '', 
-        }],
+          }
+        ],
         departItem: []
       },
     };

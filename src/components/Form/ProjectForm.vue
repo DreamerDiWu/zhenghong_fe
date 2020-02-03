@@ -1,42 +1,27 @@
 <template>
 
 <el-form style="margin-top:20px" :model="projectForm" :rules="rules" ref="projectForm" label-width="100px"  class="demo-projectForm">
-  <!-- 日志对话框 -->
-  <el-dialog title="填写申请" :visible.sync="orderDialogVisible" append-to-body>
-    <el-form>
-      <el-form-item>
-        <el-select v-model="orderForm.transactor" placeholder="请选择审批人">
-          <el-option
-            v-for="(transactor, index) in transactors"
-            :key="index"
-            :label="transactor.label"
-            :value="transactor.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="orderForm.propose_reason"  type="textarea" placeholder="请输入理由"/>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="proposeOrder">确定</el-button>
-        <el-button type="danger" @click="()=>{orderDialogVisible=false; orderForm={}}">取消</el-button>
-      </el-form-item>
-    </el-form>
-  </el-dialog>  
+  <order-form 
+  :append="true"
+  :transactors="[{label:'吴彪', value:'919086569@qq.com'}]"
+  :orderFormVisible="orderFormVisible" 
+  :closeCallBack="()=>{this.orderFormVisible=false}"
+  :submitCallBack="(orderForm)=>{this.proposeOrder(orderForm)}"
+  ></order-form>
   <!-- 基础信息 -->
   <el-form-item label="项目名称" prop="project_name">
     <el-input style="width: 500px" v-model="projectForm.project_name"></el-input>
   </el-form-item>
   <el-row>
     <el-col :span="8">
-      <el-form-item style="width: 300px" label="日期" required prop="create_time">
+      <el-form-item style="width: 300px" label="日期" prop="create_time">
         <el-tooltip effect="dark" content="日期格式：年-月-日: 时" placement="right-end">
             <el-date-picker type="datetime" placeholder="选择项目安排日期" v-model="projectForm.create_time" style="width: 100%;" format="yyyy-MM-dd HH:00:00" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
         </el-tooltip>  
       </el-form-item>
     </el-col>
     <el-col :span="6"> 
-      <el-form-item label="部门-业务类型"  label-position="right" prop="depart" required label-width="120px">
+      <el-form-item label="部门-业务类型"  label-position="right" prop="depart" label-width="120px">
         <el-cascader :options="departStruct" placeholder="请选择部门和业务类型" v-model="projectForm.departItem" @change="handleDepartChange">
         </el-cascader>
       </el-form-item>
@@ -49,29 +34,55 @@
   </el-row>
   <!-- 审核配置 -->
   <el-row>
-    <el-col v-for="(ritem, index) in reviewConfig" :key="index" :span="6">
-      <el-form-item 
-      required
-      :prop="ritem.prop" 
-      :label="ritem.label" >
-      <el-tooltip effect="dark" :content="ritem.tip" placement="right-end">
-        <el-select v-model="projectForm[ritem.prop]" placeholder="请选择">
-          <el-option
-            v-for="(item, index) in ritem.options"
-            :key="index"
-            :label="item.label"
-            :value="item.value">
+    <el-col :span="6">
+      <el-form-item
+      prop="review_lv1_user_name"
+      label="一级复核"
+      >
+        <el-select v-model="projectForm.review_lv1_user_name" placeholder="请选择">
+          <el-option :label="this.reviewer.label" :value="this.reviewer.value">
           </el-option>
         </el-select>
-      </el-tooltip>  
       </el-form-item>
     </el-col>
+    <template v-if="projectForm.departItem[0]!='工程造价'">
+      <el-col v-for="(ritem, index) in reviewConfig" :key="index" :span="6">
+        <el-form-item 
+        :prop="ritem.prop" 
+        :label="ritem.label" >
+          <el-select v-model="projectForm[ritem.prop]" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in ritem.options"
+              :key="index"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-col>
+    </template>
+    <template v-if="projectForm.departItem[0]=='工程造价'">
+      <el-col v-for="(ritem, index) in reviewConfig_construction" :key="index" :span="6">
+        <el-form-item 
+        :prop="ritem.prop" 
+        :label="ritem.label" >
+          <el-select v-model="projectForm[ritem.prop]" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in ritem.options"
+              :key="index"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-col>
+    </template>
   </el-row>
-  <el-row>
+  <!-- <el-row>
     <el-form-item prop="should_charge_amount" label="合同收款">
       <el-input  style="width:200px" placeholder="请输入金额（单位元）" v-model="projectForm.should_charge_amount"></el-input>
     </el-form-item>
-  </el-row>
+  </el-row> -->
   <!-- 成员配置 -->
   <el-divider content-position="left">项目成员配置</el-divider>
   <el-container style="margin-left:10px">
@@ -103,7 +114,7 @@
           prop="member_user_name"
           width="140">
           <template slot-scope="scope">
-            <el-input size="mini" v-if="rowOnEdit[scope.$index]" v-model="scope.row.member_user_name">{{ scope.row.name }}</el-input>
+            <el-input size="mini" v-if="rowOnEdit[scope.$index]" v-model="scope.row.member_user_name">{{ scope.row.member_user_name }}</el-input>
             <span v-if="!rowOnEdit[scope.$index]">{{ scope.row.member_user_name }}</span>
           </template>
         </el-table-column>
@@ -205,6 +216,8 @@
 <script>
   import { create_project } from '@/api/form'
   import { propose_order } from '@/api/order'
+  import { get_reviewer } from '@/api/user'
+  import OrderForm from '../../components/Form/OrderForm.vue'
   export default {
     props: {
         projectForm: {
@@ -219,6 +232,24 @@
           type: Function,
           default: ()=>{}
         }
+    },
+    components: {
+      OrderForm
+    },
+    mounted() {
+      get_reviewer(this.$store.getters.token).then(response=>{
+        this.reviewer = response.data[0]
+        console.log(this.reviewer)
+      })
+    },
+    computed: {
+      departReviewConfig() {
+        if (this.projectForm.departItem[0] == '工程造价') {
+          return this.reviewConfig_construction
+        } else {
+          return this.reviewConfig
+        }
+      }
     },
     data() {
       return {
@@ -259,34 +290,32 @@
             {value: '其他',  label: '其他'},
           ]
         }],
+        reviewer: {},
         reviewConfig: [
-          {prop: 'review_lv1_user_name', label: '一级复核', tip: "项目复核", 
+          {prop: 'review_lv2_user_name', label: '二级复核',
           options:[
-            {value: "super_user", label: "super_user"},
-            {value: "wubiao", label: "吴彪"}
+            {value: "594721769@qq.com", label: "肖强"}
           ]},
-          {prop: 'review_lv2_user_name', label: '二级复核', tip: "底稿整理审核",
+          {prop: 'review_lv3_user_name', label: '三级复核',
           options:[
-            {value: "super_user", label: "super_user"},
-            {value: "wubiao", label: "吴彪"}
+            {value: "919086569@qq.com", label: "吴彪"}
+          ]}
+        ],
+        reviewConfig_construction: [
+          {prop: 'review_lv2_user_name', label: '二级复核',
+          options:[
+            {value: "443514587@qq.com", label: "潘大菊"}
           ]},
-          {prop: 'review_lv3_user_name', label: '三级复核', tip: "报告签发",
+          {prop: 'review_lv3_user_name', label: '三级复核',
           options:[
-            {value: "super_user", label: "super_user"},
-            {value: "wubiao", label: "吴彪"}
+            {value: "549617295@qq.com", label: "李万存"}
           ]}
         ],
         rowOnEdit: [],
         tmpSaveEditRow: '',
-        roles: ['实习人员', '助理人员'],
+        roles: ['实习人员', '助理人员', '项目经理'],
         
-        orderForm: {},
-        orderDialogVisible: false,
-        transactors: [
-          {label: '吴彪', value: 'wubiao'},
-          {label: '肖强', value: 'xiaoqiang'},
-          {label: 'super_user', value: 'super_user'}
-        ],
+        orderFormVisible: false,
 
         rules: {
           project_name: [
@@ -304,9 +333,18 @@
           busz_type_extra: [
             {required: true, message: '请补充具体业务', trigger: 'blur'}
           ],
-          should_charge_amount: [
-            {required: true, message: '请选择合同收费', trigger: 'blur'}
+          review_lv1_user_name: [
+            {required: true, message: '请选择一级复核', trigger: 'blur'}
           ],
+          review_lv2_user_name: [
+            {required: true, message: '请选择二级复核', trigger: 'blur'}
+          ],
+          review_lv3_user_name: [
+            {required: true, message: '请选择三级复核', trigger: 'blur'}
+          ],
+          // should_charge_amount: [
+          //   {required: true, message: '请选择合同收费', trigger: 'blur'}
+          // ],
           description: [
             {required: true, message: '请填写实施计划', trigger: 'blur'}
           ],
@@ -331,7 +369,8 @@
           return 
         this.projectForm.depart = this.projectForm.departItem[0]
         this.projectForm.busz_type = this.projectForm.departItem[1]
-        console.log("this.projectForm.depart", this.projectForm.depart)
+        this.projectForm.review_lv2_user_name = '',
+        this.projectForm.review_lv3_user_name = ''
       },
       getDate(strDate) {
         return new Date(this.projectForm.date.replace(/-/g, "/")) 
@@ -342,7 +381,6 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            console.log("this.projectForm", this.projectForm)
             const token = this.$store.getters.token 
             create_project(token, this.projectForm).then(response=>{
               if (response.status === 200) {
@@ -362,7 +400,7 @@
       submitUpdateForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.orderDialogVisible = true
+            this.orderFormVisible = true
           } else {
             this.$message.error('修改申请失败，请检查后正确填写');
             this.confirmCallBack(1)
@@ -392,31 +430,30 @@
       handleNew(newRole) {
         let newMember = {
             role: newRole,
-            name: '未命名',
+            member_user_name: '未命名',
             salary: '0.0',
+            job: ''
           }
         this.projectForm.memberConfigData.push(newMember)
         this.handleEdit(this.projectForm.memberConfigData.length-1, newMember)
       },
-      proposeOrder() {
-        console.log("propose:", this.projectForm)
+      proposeOrder(orderForm) {
         propose_order(
           this.$store.getters.token, 
           {
             project_id: this.projectForm.project_id,
-            transactor: this.orderForm.transactor,
+            transactor: orderForm.transactor,
             operation_key: '修改项目信息', 
-            propose_reason: this.orderForm.propose_reason,
+            propose_reason: orderForm.propose_reason,
             data: this.projectForm
           }
         ).then(response=>{
           if (response.status === 200) {
             this.$message({
-              message: "修改申请成功",
+              message: "修改项目信息申请已发送",
               type: 'success'
             });
-            this.orderDialogVisible = false 
-            this.orderForm = {}
+            this.orderFormVisible = false 
             this.confirmCallBack(0)
           }
         })
