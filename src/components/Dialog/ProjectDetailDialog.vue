@@ -74,7 +74,7 @@ export default {
             detailBasicDataCol: [
                 {label: '项目ID', prop: 'project_id'},
                 {label:'项目名称',prop:'project_name'},
-                {label:'项目进度',prop:'status'},
+                // {label:'项目进度',prop:'status'},
                 {label:'项目负责人',prop:'owner_chi_name'},
                 {label: '部门', prop: 'depart'},
                 {label: '业务类型', prop: 'business'},
