@@ -171,29 +171,47 @@
 <!-- 时间安排 -->
   <el-divider content-position="left">计划时间安排</el-divider>
   <el-main>
-    <el-form-item prop="processing_dur" label="项目实施时段" label-position="left" label-width="120px" >
-      <el-date-picker
-        type="daterange"
-        range-separator="至"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-        v-model="projectForm.processing_dur"
-        value-format="yyyy-MM-dd"
-        placeholder="选择日期">
-      </el-date-picker>
-    </el-form-item>
-    <el-form-item prop="review_dur" label="项目复核时段" label-position="left" label-width="120px" >
-      <el-date-picker
-        type="daterange"
-        range-separator="至"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-        value-format="yyyy-MM-dd"
-        v-model="projectForm.review_dur"
-        placeholder="选择日期">
-      </el-date-picker>
-    </el-form-item>
-    <el-form-item prop="project_end_time" label="项目完成日期" label-position="left" label-width="120px">
+    <el-row :span="24">
+      <el-col :span="10">
+        <el-form-item prop="processing_start_time" label="项目实施开始日期" label-position="left" label-width="150px" >
+          <el-date-picker
+            v-model="projectForm.processing_start_time"
+            value-format="yyyy-MM-dd"
+            placeholder="选择日期">
+          </el-date-picker>
+        </el-form-item>
+      </el-col>
+      <el-col :span="10">
+        <el-form-item prop="processing_end_time" label="项目实施结束日期" label-position="left" label-width="150px" >
+          <el-date-picker
+            v-model="projectForm.processing_end_time"
+            value-format="yyyy-MM-dd"
+            placeholder="选择日期">
+          </el-date-picker>
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-row :span="24">
+      <el-col :span="10">
+        <el-form-item prop="review_start_time" label="项目复核开始日期" label-position="left" label-width="150px" >
+          <el-date-picker
+            v-model="projectForm.review_start_time"
+            value-format="yyyy-MM-dd"
+            placeholder="选择日期">
+          </el-date-picker>
+        </el-form-item>
+      </el-col>
+      <el-col :span="10">
+        <el-form-item prop="review_end_time" label="项目复核结束日期" label-position="left" label-width="150px" >
+          <el-date-picker
+            v-model="projectForm.review_end_time"
+            value-format="yyyy-MM-dd"
+            placeholder="选择日期">
+          </el-date-picker>
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-form-item prop="project_end_time" label="项目预计完成日期" label-position="left" label-width="150px">
       <el-date-picker
         value-format="yyyy-MM-dd"
         v-model="projectForm.project_end_time"
@@ -201,20 +219,20 @@
         placeholder="与合同委托要求时间一致">
       </el-date-picker>
     </el-form-item>
-    <el-form-item prop="description" label="实施计划" label-position="left" label-width="120px">
+    <el-form-item prop="description" label="实施计划" label-position="left" label-width="150px">
       <el-input type="textarea" v-model="projectForm.description" placeholder="请简述实施计划"></el-input>
     </el-form-item>
   </el-main>
   <!-- 提交按钮 -->
   <el-footer style="margin-left:20px">
-    <el-button v-if="!update" type="primary" @click="submitForm('projectForm')">立即创建</el-button>
-    <el-button v-if="update" type="primary" @click="submitUpdateForm('projectForm')">申请修改</el-button>
+    <el-button v-if="!update" type="primary" @click="submitForm('projectForm')">立即保存</el-button>
+    <el-button v-if="update" type="primary" @click="submitUpdateForm('projectForm')">提交修改</el-button>
     <el-button @click="resetForm('projectForm')">重置</el-button>
   </el-footer>
 </el-form>    
 </template>
 <script>
-  import { create_project } from '@/api/form'
+  import { create_project, update_project, submit_project } from '@/api/form'
   import { propose_order } from '@/api/order'
   import { get_reviewer } from '@/api/user'
   import OrderForm from '../../components/Form/OrderForm.vue'
@@ -351,10 +369,16 @@
           start_date: [
             {required: true, message: '请选择日期', trigger: 'change'}
           ],
-          processing_dur: [
+          processing_start_time: [
             {required: true, message: '请选择日期', trigger: 'change'}
           ],
-          review_dur: [
+          processing_end_time: [
+            {required: true, message: '请选择日期', trigger: 'change'}
+          ],
+          review_start_time: [
+            {required: true, message: '请选择日期', trigger: 'change'}
+          ],
+          review_end_time: [
             {required: true, message: '请选择日期', trigger: 'change'}
           ],
           project_end_time: [
@@ -400,7 +424,21 @@
       submitUpdateForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.orderFormVisible = true
+            console.log(this.projectForm)
+            if (this.projectForm.status == '未提交') {
+              update_project(this.$store.getters.token, this.projectForm).then(response=>{
+                if (response.status==200) {
+                  this.$message.success('修改成功')
+                  this.confirmCallBack(0)
+                } else {
+                  this.$message.error('修改失败')
+                  this.confirmCallBack(1)
+                }
+              })
+            } else {
+              this.orderFormVisible = true
+            }
+            
           } else {
             this.$message.error('修改申请失败，请检查后正确填写');
             this.confirmCallBack(1)

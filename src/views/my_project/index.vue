@@ -1,5 +1,17 @@
 <template>
   <el-container style="width:100%; margin-top:50px">
+    <!-- 确认框 -->
+    <el-dialog
+      title="提示"
+      :visible="confirmDialogVisible"
+      width="30%"
+      center>
+      <span>注意：项目提交后若修改需要通过申请</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="confirmDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitProject">确 定</el-button>
+      </span>
+    </el-dialog>
     <!-- 申请普通填写表 -->
     <order-form 
     :append="true" 
@@ -165,7 +177,7 @@ import CheckoutForm from '../../components/Form/CheckoutForm.vue'
 import PublishForm from '../../components/Form/PublishForm.vue'
 import ProjectDetailDialog from '../../components/Dialog/ProjectDetailDialog.vue'
 import ProjectStatusTag from '../../components/Tag/ProjectStatusTag.vue'
-import { get_user_project_info, get_project_info, create_project_log } from '@/api/form'
+import { get_user_project_info, get_project_info, create_project_log, submit_project } from '@/api/form'
 import { propose_order } from '@/api/order'
 import { getToken } from '@/utils/auth'
 
@@ -216,6 +228,14 @@ export default {
           label: '修改项目信息', 
           handle: row=>{this.showEditDialog(row)}, 
           disable: row=>{return row.status == '已暂停' || this.hasOrderStatus(row, '修改项目信息', '审批中')}
+        },
+        {
+          label: '提交项目', 
+          handle: row=>{
+            this.confirmDialogVisible = true;
+            this.currProjectId = row.project_id
+          }, 
+          disable: row=>{return (row.status != '未提交')}
         },
         {
           label: '申请一级复核', 
@@ -312,6 +332,7 @@ export default {
       //详情页对话框
       detailDialogVisible: false,
       detailData: {},
+      confirmDialogVisible: false,
       // 报告制作填报
       publishFormVisible: false,
       // 底稿存档填报
@@ -400,6 +421,17 @@ export default {
         } 
       });
       return flag  
+    },
+    submitProject() {
+      submit_project(this.$store.getters.token, {project_id: this.currProjectId}).then(response=>{
+        if (response.status==200) {
+          this.$message.success("提交成功")
+          this.confirmDialogVisible = false
+          this.flushProjectInfo()
+        } else {
+          this.$message.error("提交失败")
+        }
+      })
     },
   },
 }

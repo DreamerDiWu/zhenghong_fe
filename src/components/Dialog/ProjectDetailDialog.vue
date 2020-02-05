@@ -83,7 +83,6 @@ export default {
                 {label: '复核开始日期', prop: 'processing_start_time'},
                 {label: '复核完成日期', prop: 'processing_start_time'},
                 {label: '项目预计完成日期', prop: 'project_end_time'},
-                {label: '业务类型', prop: 'business'},
                 // {label: '合同收款', prop: 'should_charge_amount'},
                 {label: '实施计划', prop: 'description'},
                 {label: '一级复核', prop: 'lv1_review', children: [

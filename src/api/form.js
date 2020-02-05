@@ -8,6 +8,22 @@ export function create_project(token, form) {
   })
 }
 
+export function update_project(token, form) {
+  return request({
+    url: '/form/update_project?token=' + token, 
+    method: 'post',
+    data: form 
+  })
+}
+
+export function submit_project(token, form) {
+  return request({
+    url: '/form/submit_project?token=' + token, 
+    method: 'post',
+    data: form 
+  })
+}
+
 // 'project_id', 'content', 'create_time'
 export function create_project_log(token, form) {
   return request({

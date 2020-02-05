@@ -93,7 +93,7 @@
     <!-- 表格 -->
     <el-main style="position:relative;margin-top:50px">
       <div class="queryResult">
-        <el-table :data="filterResultData" border >
+        <el-table :data="filterResultData" @sort-change="sortChange" border >
           <el-table-column label="项目名称">
             <template slot-scope="scope">
               <el-tooltip effect="dark" content="点击显示详情" placement="right-end">
@@ -106,7 +106,12 @@
               <project-status-tag :scope="scope"></project-status-tag>
             </template>
           </el-table-column>
-          <el-table-column v-for="col in tableCols" :label="col.label" :prop="col.prop" :sortable="true">
+          <el-table-column 
+          v-for="(col,index) in tableCols" 
+          :key="index"
+          :label="col.label" 
+          :prop="col.prop" 
+          sortable="custom">
           </el-table-column>
         </el-table>
       </div>
@@ -114,7 +119,8 @@
         <el-divider content-position="left">统计结果</el-divider>
           <el-table :data="statsResultData">
             <el-table-column 
-            v-for="col in filterResultDataCols" 
+            v-for="(col,index) in filterResultDataCols" 
+            :key="index"
             :prop="col.prop" 
             :label="col.label" >
             </el-table-column>
@@ -147,7 +153,16 @@ export default {
       })
     },
     filterResultData() {
-      return this.rawtableData.filter(data=>this.filterData(data))
+      let filterResult = this.rawtableData.filter(data=>this.filterData(data))
+      if (this.sortOrder == null) {
+        return filterResult
+      }
+      if (this.sortOrder == 'ascending') {
+        filterResult.sort((a, b)=>{return a[this.sortColumn] > b[this.sortColumn]})
+      } else {
+        filterResult.sort((a, b)=>{return a[this.sortColumn] <= b[this.sortColumn]})
+      }
+      return filterResult
     },
 
     statsResultData() {
@@ -279,9 +294,15 @@ export default {
       //详情页对话框
       detailDialogVisible: false,
       detailData: {},
+      sortOrder: null,
+      sortColumn: ''
     }
   },
   methods: {
+    sortChange({column, prop, order}) {
+      this.sortOrder = order
+      this.sortColumn = prop
+    },
     filterData(data) {
       let singleFilterProps = this.filterItem.single 
       let multipleFilterProps = this.filterItem.multiple
@@ -319,7 +340,7 @@ export default {
     },
     showDetailDialog(index) {
       this.detailDialogVisible = false;
-      this.detailData = this.rawtableData[index]
+      this.detailData = this.filterResultData[index]
       this.detailDialogVisible = true;
     },
     statsValue(prop, label) {
