@@ -65,7 +65,7 @@ export const asyncRoutes = [
     component: Layout, 
     redirect: '/project/my_project',
     name: '项目管理',
-    meta: { title: '项目管理', icon: 'example', roles: ['项目经理', '助理', '部门经理', '管理员'] },
+    meta: { title: '项目管理', icon: 'example', roles: ['项目经理', '助理', '部门经理', '管理员', '技术负责人'] },
     children: [
       {
         path: 'new_project',
