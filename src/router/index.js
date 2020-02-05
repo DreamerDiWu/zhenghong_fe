@@ -91,7 +91,7 @@ export const asyncRoutes = [
         path: 'index',
         name: 'Query',
         component: () => import('@/views/query/index'),
-        meta: { title: '查询', icon: 'eye-open', roles: ['主任会计师', '副主任会计师', '部门经理', '管理员'] }
+        meta: { title: '查询', icon: 'eye-open', roles: ['主任会计师', '副主任会计师', '部门经理', '技术负责人', '管理员'] }
       }
     ]
   },
