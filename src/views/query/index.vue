@@ -167,8 +167,8 @@ export default {
       rawtableData: [],
       tableCols:[
         {label: '立项日期', prop: 'create_time'},
-        {label: '实施日期', prop: 'processing_start_time'},
-        {label: '结束日期', prop: 'processing_end_time'},
+        {label: '实施开始日期', prop: 'processing_start_time'},
+        {label: '预计完成日期', prop: 'project_end_time'},
         {label: '项目耗时（天）', prop: 'day_passed'},
         {label: '项目每日工时', prop: 'work_time_per_day'},
         {label: '项目成本', prop: 'should_checkout_amount'},
