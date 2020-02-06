@@ -154,14 +154,25 @@ export default {
     },
     filterResultData() {
       let filterResult = this.rawtableData.filter(data=>this.filterData(data))
-      if (this.sortOrder == null) {
+      if (!filterResult.length) {
         return filterResult
       }
       if (this.sortOrder == 'ascending') {
-        filterResult.sort((a, b)=>{return a[this.sortColumn] > b[this.sortColumn]})
-      } else {
-        filterResult.sort((a, b)=>{return a[this.sortColumn] <= b[this.sortColumn]})
-      }
+        if (typeof filterResult[0][this.sortColumn] == 'number') {
+          filterResult.sort((a, b)=>{return a[this.sortColumn] - b[this.sortColumn]})
+        } else {
+          filterResult.sort((a, b)=>{return a[this.sortColumn].localeCompare(b[this.sortColumn],'zh-CN')})
+        }
+        
+      } else if (this.sortOrder == 'descending') {
+        
+        if (typeof filterResult[0][this.sortColumn] == 'number') {
+          filterResult.sort((a, b)=>{return b[this.sortColumn] - a[this.sortColumn]})
+        } else {
+          filterResult.sort((a, b)=>{return b[this.sortColumn]                        .localeCompare(a[this.sortColumn],'zh-CN')})
+        }
+      } else if (this.sortOrder == null) {
+      } 
       return filterResult
     },
 

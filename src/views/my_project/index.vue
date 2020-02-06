@@ -5,6 +5,7 @@
       title="提示"
       :visible="confirmDialogVisible"
       width="30%"
+      @close="confirmDialogVisible = false"
       center>
       <span>注意：项目提交后若修改需要通过申请</span>
       <span slot="footer" class="dialog-footer">
