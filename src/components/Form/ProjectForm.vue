@@ -9,12 +9,12 @@
   :submitCallBack="(orderForm)=>{this.proposeOrder(orderForm)}"
   ></order-form>
   <!-- 基础信息 -->
-  <el-form-item label="项目名称" prop="project_name">
+  <el-form-item label="项目名称"  label-width="120px" prop="project_name">
     <el-input style="width: 500px" v-model="projectForm.project_name"></el-input>
   </el-form-item>
   <el-row>
     <el-col :span="8">
-      <el-form-item style="width: 300px" label="日期" prop="create_time">
+      <el-form-item style="width: 300px" label="日期" label-width="120px" prop="create_time">
         <el-tooltip effect="dark" content="日期格式：年-月-日: 时" placement="right-end">
             <el-date-picker type="datetime" placeholder="选择项目安排日期" v-model="projectForm.create_time" style="width: 100%;" format="yyyy-MM-dd HH:00:00" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
         </el-tooltip>  
@@ -34,10 +34,11 @@
   </el-row>
   <!-- 审核配置 -->
   <el-row>
-    <el-col :span="6">
+    <el-col :span="6" >
       <el-form-item
       prop="review_lv1_user_name"
       label="一级复核"
+      label-width="120px"
       >
         <el-select v-model="projectForm.review_lv1_user_name" placeholder="请选择">
           <el-option :label="this.reviewer.label" :value="this.reviewer.value">
@@ -78,11 +79,18 @@
       </el-col>
     </template>
   </el-row>
-  <!-- <el-row>
-    <el-form-item prop="should_charge_amount" label="合同收款">
-      <el-input  style="width:200px" placeholder="请输入金额（单位元）" v-model="projectForm.should_charge_amount"></el-input>
+  <el-row>
+    <el-form-item prop="should_charge" label="合同应收款(元)" label-width="120px">
+      <el-input-number 
+      :controls="false"
+      :min=0
+      style="width:150px" 
+      precision="2"
+      placeholder="单位元" 
+      v-model="projectForm.should_charge">
+      </el-input-number>
     </el-form-item>
-  </el-row> -->
+  </el-row>
   <!-- 成员配置 -->
   <el-divider content-position="left">项目成员配置</el-divider>
   <el-container style="margin-left:10px">
@@ -360,9 +368,9 @@
           review_lv3_user_name: [
             {required: true, message: '请选择三级复核', trigger: 'blur'}
           ],
-          // should_charge_amount: [
-          //   {required: true, message: '请选择合同收费', trigger: 'blur'}
-          // ],
+          should_charge: [
+            {required: true, message: '请选择合同收费', trigger: 'blur'},
+          ],
           description: [
             {required: true, message: '请填写实施计划', trigger: 'blur'}
           ],
