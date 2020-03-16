@@ -34,7 +34,7 @@
   </el-row>
   <!-- 审核配置 -->
   <el-row>
-    <el-col :span="6" >
+    <!-- <el-col :span="6" >
       <el-form-item
       prop="review_lv1_user_name"
       label="一级复核"
@@ -45,8 +45,8 @@
           </el-option>
         </el-select>
       </el-form-item>
-    </el-col>
-    <template v-if="projectForm.departItem[0]!='工程造价'">
+    </el-col> -->
+    <!-- <template v-if="projectForm.departItem[0]!='工程造价'">
       <el-col v-for="(ritem, index) in reviewConfig" :key="index" :span="6">
         <el-form-item 
         :prop="ritem.prop" 
@@ -62,11 +62,12 @@
         </el-form-item>
       </el-col>
     </template>
-    <template v-if="projectForm.departItem[0]=='工程造价'">
-      <el-col v-for="(ritem, index) in reviewConfig_construction" :key="index" :span="6">
+    <template v-if="projectForm.departItem[0]=='工程造价'"> -->
+      <el-col v-for="(ritem, index) in reviewConfig" :key="index" :span="6" >
         <el-form-item 
         :prop="ritem.prop" 
-        :label="ritem.label" >
+        :label="ritem.label" 
+        label-width="120px" >
           <el-select v-model="projectForm[ritem.prop]" placeholder="请选择">
             <el-option
               v-for="(item, index) in ritem.options"
@@ -77,7 +78,7 @@
           </el-select>
         </el-form-item>
       </el-col>
-    </template>
+    <!-- </template> -->
   </el-row>
   <el-row>
     <el-form-item prop="should_charge" label="合同应收款(元)" label-width="120px">
@@ -85,7 +86,7 @@
       :controls="false"
       :min=0
       style="width:150px" 
-      precision="2"
+      :precision="2"
       placeholder="单位元" 
       v-model="projectForm.should_charge">
       </el-input-number>
@@ -263,9 +264,13 @@
       OrderForm
     },
     mounted() {
+      // get_reviewer(this.$store.getters.token).then(response=>{
+      //   this.reviewer = response.data[0]
+      //   console.log(this.reviewer)
+      // })
       get_reviewer(this.$store.getters.token).then(response=>{
-        this.reviewer = response.data[0]
-        console.log(this.reviewer)
+        this.reviewConfig = response.data
+        console.log(this.reviewConfig)
       })
     },
     computed: {
@@ -316,27 +321,28 @@
             {value: '其他',  label: '其他'},
           ]
         }],
-        reviewer: {},
-        reviewConfig: [
-          {prop: 'review_lv2_user_name', label: '二级复核',
-          options:[
-            {value: "594721769@qq.com", label: "肖强"}
-          ]},
-          {prop: 'review_lv3_user_name', label: '三级复核',
-          options:[
-            {value: "919086569@qq.com", label: "吴彪"}
-          ]}
-        ],
-        reviewConfig_construction: [
-          {prop: 'review_lv2_user_name', label: '二级复核',
-          options:[
-            {value: "443514587@qq.com", label: "潘大菊"}
-          ]},
-          {prop: 'review_lv3_user_name', label: '三级复核',
-          options:[
-            {value: "549617295@qq.com", label: "李万存"}
-          ]}
-        ],
+        reviewConfig: {},
+        // reviewer: {},
+        // reviewConfig: [
+        //   {prop: 'review_lv2_user_name', label: '二级复核',
+        //   options:[
+        //     {value: "594721769@qq.com", label: "肖强"}
+        //   ]},
+        //   {prop: 'review_lv3_user_name', label: '三级复核',
+        //   options:[
+        //     {value: "919086569@qq.com", label: "吴彪"}
+        //   ]}
+        // ],
+        // reviewConfig_construction: [
+        //   {prop: 'review_lv2_user_name', label: '二级复核',
+        //   options:[
+        //     {value: "443514587@qq.com", label: "潘大菊"}
+        //   ]},
+        //   {prop: 'review_lv3_user_name', label: '三级复核',
+        //   options:[
+        //     {value: "549617295@qq.com", label: "李万存"}
+        //   ]}
+        // ],
         rowOnEdit: [],
         tmpSaveEditRow: '',
         roles: ['实习人员', '助理人员', '项目经理'],
