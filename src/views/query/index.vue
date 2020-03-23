@@ -39,7 +39,7 @@
           </el-col>
         </el-row>
         <el-row :gutter="20">
-          <el-col :span="6" v-for="(item,index) in yesOrNoItem" :key="index">
+          <el-col :span="4" v-for="(item,index) in yesOrNoItem" :key="index">
             <el-select
              v-model="filterItem.multiple[item.prop]" multiple :placeholder="item.label" clearable >
               <el-option
@@ -266,7 +266,7 @@ export default {
           charge: [],
           // lv1_review: [],
           // lv2_review: [],
-          // lv3_review: [],
+          lv3_review: [],
           save: [],
           publish: [],
           checkout: []
@@ -277,6 +277,7 @@ export default {
         {label: '底稿存档', prop: 'save'},
         {label: '报告制作', prop: 'publish'},
         {label: '计发工资', prop: 'checkout'},
+        {label: '三级审核', prop: 'lv3_review'}
       ],
       checkList: [],
       departItem: [],
