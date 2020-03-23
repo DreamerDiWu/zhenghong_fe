@@ -221,7 +221,7 @@ export default {
       transactors: [
         {label: '刘星', value: '103530090@qq.com'},
         {label: '陈锐', value: '11844971@qq.com'},
-        {label: '徐露耘', value: '2334098655@qq.com'}
+        {label: '谭梅', value: '2334098655@qq.com'}
       ],
       // 管理选项
       manageHandler: [
