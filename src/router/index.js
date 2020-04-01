@@ -103,7 +103,7 @@ export const asyncRoutes = [
         path: 'index',
         name: 'Review',
         component: () => import('@/views/review/index'),
-        meta: { title: '我的审核', icon: 'form', roles: ['主任会计师', '副主任会计师', '部门经理', '技术负责人', '行政助理', '管理员'] }
+        meta: { title: '我的审核', icon: 'form', roles: ['主任会计师', '副主任会计师', '部门经理', '技术负责人', '行政助理', '管理员','项目经理'] }
       }
     ]
 

@@ -228,7 +228,7 @@ export default {
         {
           label: '修改项目信息', 
           handle: row=>{this.showEditDialog(row)}, 
-          disable: row=>{return row.status == '已暂停' || this.hasOrderStatus(row, '修改项目信息', '审批中')}
+          disable: row=>{return this.hasOrderStatus(row, '修改项目信息', '审批中')}
         },
         {
           label: '提交项目', 
@@ -241,17 +241,17 @@ export default {
         {
           label: '申请一级复核', 
           handle: row=>{this.proposeStatusChange(row.project_id, row.review_lv1_user_name, '一级复核')}, 
-          disable: row=>{return row.status == '已暂停' || this.hasOrderStatus(row, '一级复核', '审批中') || row.lv1_review == "是" }
+          disable: row=>{return ['已暂停', '未提交'].includes(row.status) || this.hasOrderStatus(row, '一级复核', '审批中') || row.lv1_review == "是" }
         },
         {
           label: '申请二级复核', 
           handle: row=>{this.proposeStatusChange(row.project_id, row.review_lv2_user_name, '二级复核')}, 
-          disable: row=>{return row.status == '已暂停' || this.hasOrderStatus(row, '二级复核', '审批中') || row.lv2_review == "是" || row.lv1_review != "是"}
+          disable: row=>{return ['已暂停', '未提交'].includes(row.status) || this.hasOrderStatus(row, '二级复核', '审批中') || row.lv2_review == "是" || row.lv1_review != "是"}
         },
         {
           label: '申请三级复核', 
           handle: row=>{this.proposeStatusChange(row.project_id, row.review_lv3_user_name, '三级复核')}, 
-          disable: row=>{return row.status == '已暂停' || this.hasOrderStatus(row, '三级复核', '审批中') || row.lv3_review == "是" || row.lv2_review != "是" || row.lv1_review != "是"}
+          disable: row=>{return ['已暂停', '未提交'].includes(row.status) || this.hasOrderStatus(row, '三级复核', '审批中') || row.lv3_review == "是" || row.lv2_review != "是" || row.lv1_review != "是"}
         },
         {
           label: '报告制作', 
@@ -259,7 +259,7 @@ export default {
             this.publishFormVisible = true;
             this.currProjectId = row.project_id
           }, 
-          disable: row=>{return (row.status == '已暂停' || row.lv3_review != "是" || row.publish == '是')}
+          disable: row=>{return (['已暂停', '未提交'].includes(row.status) || row.lv3_review != "是" || row.publish == '是')}
         },
         {
           label: '收款确认', 
@@ -267,7 +267,7 @@ export default {
             this.chargeFormVisible = true;
             this.currProjectId = row.project_id
           }, 
-          disable: row=>{return (row.status == '已暂停' || row.lv3_review != "是" || row.charge == '是')}
+          disable: row=>{return (['已暂停', '未提交'].includes(row.status) || row.lv3_review != "是" || row.charge == '是')}
         },
         {
           label: '底稿存档', 
@@ -275,7 +275,7 @@ export default {
             this.saveFormVisible = true;
             this.currProjectId = row.project_id
           }, 
-          disable: row=>{return (row.status == '已暂停' || row.lv3_review != "是" || row.save == '是')}
+          disable: row=>{return (['已暂停', '未提交'].includes(row.status) || row.lv3_review != "是" || row.save == '是')}
         },
         {
           label: '工资计发', 
@@ -283,7 +283,7 @@ export default {
             this.checkoutFormVisible = true;
             this.currProjectId = row.project_id
           }, 
-          disable: row=>{return (row.status == '已暂停' || row.charge != "是" || row.checkout == '是')}
+          disable: row=>{return (['已暂停', '未提交'].includes(row.status) || row.charge != "是" || row.checkout == '是')}
         },
         {
           label: '中止项目', 
@@ -301,7 +301,7 @@ export default {
             this.orderOperationKey = '暂停项目';
             this.currProjectId = row.project_id
           }, 
-          disable: row=>{return row.status == '已暂停'}
+          disable: row=>{return ['已暂停', '未提交'].includes(row.status)}
         },
         {
           label: '恢复项目', 
@@ -319,14 +319,14 @@ export default {
             this.orderOperationKey = '完结项目';
             this.currProjectId = row.project_id
           }, 
-          disable: row=>{return row.status == '已暂停' || row.checkout != '是'}
+          disable: row=>{return ['已暂停', '未提交'].includes(row.status) || row.checkout != '是'}
         },
-        {
+        { 
           label: '录入日志', 
           handle: row=>{ 
             this.currProjectId = row.project_id; this.logDialogVisible = true;
           }, 
-          disable: row=>{return row.status == '已暂停'}
+          disable: row=>{return ['已暂停', '未提交'].includes(row.status)}
         },
       ],
 
