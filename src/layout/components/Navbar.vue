@@ -1,5 +1,10 @@
 <template>
   <div class="navbar">
+    <project-detail-dialog 
+      :detailData="detailData" 
+      :detailDialogVisible="detailDialogVisible"
+      :closeCallBack="()=>{this.detailDialogVisible = false}">
+    </project-detail-dialog>
     <el-dialog :visible="passDialogVisible" @close="handleClose" append-to-body width="50%">
       <password-form :submitCallback="submitForm"></password-form>
     </el-dialog>   
@@ -43,7 +48,14 @@
                     <el-tag type="success" v-if="scope.row.read_==1">已读</el-tag>
                     <span style="float:right">{{scope.row.create_time}}</span>
                   </div>
-                  <span>{{scope.row.content}}</span>
+                  <span style="width:200px">{{scope.row.content.split('id=')[0]}}</span>
+                  <el-button 
+                  v-if="scope.row.content.split('id=').length==2" 
+                  type="text" 
+                  style="float:right" 
+                  @click="showProjectDetail(scope.row.content.split('id=')[1])"
+                  >点这里查看详情
+                  </el-button>
                 </el-card>
               </template>
             </el-table-column>
@@ -74,6 +86,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { reset_password } from '@/api/user'
+import { get_project_info } from '@/api/form'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import passwordForm from '../../components/Form/passwordForm.vue'
@@ -134,14 +147,13 @@ export default {
     }
   },
   methods: {
-    // showDetailDialog(row) {
-    //   console.log(row)
-    //   const project_id = row.project_id
-    //   pull_detail({project_id: project_id, get_member_info:true, get_log_info: true}).then(response=>{
-    //     this.detailData = response.data[0]
-    //   })      
-    //   this.detailDialogVisible = true;
-    // },
+    showProjectDetail(project_id) {
+      console.log(project_id)
+      get_project_info({project_id: project_id}).then(response=>{
+        this.detailData = response.data[0]
+      })      
+      this.detailDialogVisible = true;
+    },
     gotoReview() {
       this.$router.push('/review/index')
     },
@@ -153,6 +165,7 @@ export default {
       this.$router.push(`/login`)
     },
     readMessage() {
+
       this.$store.dispatch('user/readMessage')
     },
     flushUserInfo() {

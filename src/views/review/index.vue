@@ -118,6 +118,7 @@ export default {
         {label:'详情', prop:'propose_reason'},
         {label: '审批状态', prop: 'status'},
         {label: '审批结果', prop: 'transact_result'},
+        {label: '审批原因', prop: 'transact_reason'},
         {label:'申请人',prop:'proposer_chi_name'},
       ],
 

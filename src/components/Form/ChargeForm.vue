@@ -1,6 +1,12 @@
 <template>
     <el-dialog title="确认收款填报" :visible="chargeFormVisible" @close="handleClose">
       <el-form :model="chargeData" :rules="rules" :ref="formName">
+        <el-form-item label="委托单位名称" prop="client_name">
+          <el-input v-model="chargeData.charge_amount"/>
+        </el-form-item>
+        <el-form-item label="报告编号" prop="publish_id">
+          <el-input v-model="chargeData.charge_amount"/>
+        </el-form-item>
         <el-form-item label="收款金额（元）" prop="charge_amount">
           <el-input-number :precision="2" :controls="false" style="width:150px" v-model="chargeData.charge_amount"  placeholder="请输入收款金额"/>
         </el-form-item>
@@ -53,6 +59,12 @@
         formName: 'chargeForm',
         chargeData: this.initData(),
         rules: {
+          publish_id: [
+            { required: true, message: '请正确填写报告编号', trigger: 'blur'}
+          ],
+          client_name: [
+            { required: true, message: '请填写委托单位名称', trigger: 'blur'}
+          ],
           charge_amount: [
             { required: true, message: '请正确填写收款金额', trigger: 'blur', type: 'number'}
           ],
@@ -68,6 +80,8 @@
     methods: {
         initData() {
             return {
+                client_name: '',
+                publish_id: '',
                 charge_amount: '',
                 charge_time: '',
                 transactor: ''

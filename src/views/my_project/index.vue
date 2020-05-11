@@ -17,7 +17,7 @@
     <order-form 
     :append="true" 
     :orderFormVisible="orderFormVisible" 
-    :transactors="transactors"
+    :transactors="bossTransators"
     :closeCallBack="()=>{orderFormVisible=false; orderOperationKey=''; currProjectId=''}"
     :submitCallBack="(orderForm)=>{
       proposeOrder(currProjectId,orderForm.transactor, orderOperationKey,orderForm.propose_reason,{})
@@ -51,7 +51,12 @@
           currProjectId, 
           chargeData.transactor, 
           '收款确认', 
-          ['收款金额:'+chargeData.charge_amount, '收款时间:'+chargeData.charge_time].join('\n'),
+          [
+          '委托单位:'+chargeData.client_name,
+          '报告编号:'+chargeData.publish_id,
+          '收款金额:'+chargeData.charge_amount, 
+          '收款时间:'+chargeData.charge_time,
+          ].join('\n'),
           chargeData
         )
         currProjectId = ''
@@ -222,6 +227,9 @@ export default {
         {label: '刘星', value: '103530090@qq.com'},
         {label: '陈锐', value: '11844971@qq.com'},
         {label: '谭梅', value: '2334098655@qq.com'}
+      ],
+      bossTransators: [
+        {label: '吴彪', value: '919086569@qq.com'}
       ],
       // 管理选项
       manageHandler: [

@@ -68,8 +68,12 @@
 import { validUsername } from '@/utils/validate'
 import { send_valid_link } from '@/api/user'
 import bgImg from '../../assets/404_images/loginv2_1024.png'
+import { getUserName, setUserName, removeUserName } from '@/utils/auth'
 export default {
   name: 'Login',
+  mounted() {
+    this.loginForm.username = getUserName()
+  },
   data() {
     const validateUsername = (rule, value, callback) => {
       callback()
