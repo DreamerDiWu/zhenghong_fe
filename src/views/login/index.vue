@@ -59,8 +59,11 @@
       </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
-      <el-button style="margin-left: 180px; margin-top:-1000px" type="text" @click="()=>{formVisible=true}">忘记密码？</el-button>
+      <el-button style="margin-left: 180px; margin-top:-1200px" type="text" @click="()=>{formVisible=true}">忘记密码？</el-button>
+      <el-row></el-row>
+      <div class="footer" ><a href="http://beian.miit.gov.cn" >渝ICP备19017533号</a></div>
     </el-form>
+    
   </div>
 </template>
 
@@ -174,6 +177,13 @@ $cursor: #fff;
   }
 }
 
+.footer {
+    width: 100%;
+    margin-top: -0px;
+    text-align: center;
+    color: #ffffff;
+    font-size: 13px;
+}
 /* reset element-ui css */
 .login-container {
   .el-input {
