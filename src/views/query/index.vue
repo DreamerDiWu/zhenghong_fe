@@ -169,7 +169,7 @@ export default {
         if (typeof filterResult[0][this.sortColumn] == 'number') {
           filterResult.sort((a, b)=>{return b[this.sortColumn] - a[this.sortColumn]})
         } else {
-          filterResult.sort((a, b)=>{return b[this.sortColumn]                        .localeCompare(a[this.sortColumn],'zh-CN')})
+          filterResult.sort((a, b)=>{return b[this.sortColumn].localeCompare(a[this.sortColumn],'zh-CN')})
         }
       } else if (this.sortOrder == null) {
       } 

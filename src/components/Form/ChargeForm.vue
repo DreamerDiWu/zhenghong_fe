@@ -2,10 +2,10 @@
     <el-dialog title="确认收款填报" :visible="chargeFormVisible" @close="handleClose">
       <el-form :model="chargeData" :rules="rules" :ref="formName">
         <el-form-item label="委托单位名称" prop="client_name">
-          <el-input v-model="chargeData.charge_amount"/>
+          <el-input v-model="chargeData.client_name"/>
         </el-form-item>
         <el-form-item label="报告编号" prop="publish_id">
-          <el-input v-model="chargeData.charge_amount"/>
+          <el-input v-model="chargeData.publish_id"/>
         </el-form-item>
         <el-form-item label="收款金额（元）" prop="charge_amount">
           <el-input-number :precision="2" :controls="false" style="width:150px" v-model="chargeData.charge_amount"  placeholder="请输入收款金额"/>

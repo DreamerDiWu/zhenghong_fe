@@ -157,9 +157,11 @@ export default {
           } else {
             this.reviewedData.push(row)
           }
-        })      
+        })
+
+      this.reviewedData.sort((a, b)=>{return b.modify_time.localeCompare(a.modify_time)})
       })
-      console.log(this.toReviewData)
+
     },
     transact() {
       const token = this.$store.getters.token 

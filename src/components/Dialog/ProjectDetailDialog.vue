@@ -110,6 +110,7 @@ export default {
                 ]},
                 {label:'收款确认',prop:'charge', children: [
                   {label: '收款确认审核', prop: 'charge_transactor_chi_name'},
+                  {label: '委托单位名称', prop: 'client_name'},
                   {label: '收款金额（元）', prop: 'charge_amount'},
                   {label: '收款时间', prop: 'charge_time'},
                 ]},
