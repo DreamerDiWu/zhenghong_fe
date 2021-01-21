@@ -198,7 +198,6 @@ function lessThanToday(str){
     if(d<10){
         d="0"+d;
     }
-    console.log(y + '-' + m + '-' + d)
     return str < (y + '-' + m + '-' + d);
 }
 export default {
@@ -382,7 +381,6 @@ export default {
   },
   methods: {
     IsProjectDateAllValid(projectForm) {
-      console.log(projectForm)
       let valid = true;
       [ 
         'processing_start_time', 
@@ -391,7 +389,6 @@ export default {
         'review_end_time',
         'project_end_time'
       ].forEach((property)=>{
-        console.log(projectForm[property])
         if (lessThanToday(projectForm[property])) {
           valid = false;
         }
