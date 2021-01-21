@@ -241,6 +241,7 @@
 </el-form>    
 </template>
 <script>
+
   import { create_project, update_project, submit_project } from '@/api/form'
   import { propose_order } from '@/api/order'
   import { get_reviewer } from '@/api/user'
@@ -402,6 +403,7 @@
       };
     },
     methods: {
+
       handleDepartChange() {
         if (!this.projectForm.departItem.length)
           return 
@@ -449,7 +451,7 @@
                   this.confirmCallBack(1)
                 }
               })
-            } else {
+            } else { 
               this.orderFormVisible = true
             }
             

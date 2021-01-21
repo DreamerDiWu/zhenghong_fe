@@ -7,7 +7,7 @@
       width="30%"
       @close="confirmDialogVisible = false"
       center>
-      <span>注意：项目提交后若修改需要通过申请</span>
+      <span>注意： 1. 项目提交后若修改需要审批；2. 项目日期填写早于今日需要审批</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="confirmDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="submitProject">确 定</el-button>
@@ -186,7 +186,21 @@ import ProjectStatusTag from '../../components/Tag/ProjectStatusTag.vue'
 import { get_user_project_info, get_project_info, create_project_log, submit_project } from '@/api/form'
 import { propose_order } from '@/api/order'
 import { getToken } from '@/utils/auth'
-
+function lessThanToday(str){
+    var date = new Date();
+    var y = date.getFullYear(); // 年
+    var m = date.getUTCMonth() + 1; // 月份从0开始的
+    var d = date.getDate(); //日
+    if(m<10){
+        m="0"+m;
+    }
+    var d = date.getDate();
+    if(d<10){
+        d="0"+d;
+    }
+    console.log(y + '-' + m + '-' + d)
+    return str < (y + '-' + m + '-' + d);
+}
 export default {
   components: {
     ProjectForm,
@@ -241,8 +255,14 @@ export default {
         {
           label: '提交项目', 
           handle: row=>{
-            this.confirmDialogVisible = true;
-            this.currProjectId = row.project_id
+            if (this.IsProjectDateAllValid(row)) {
+              this.confirmDialogVisible = true;
+              this.currProjectId = row.project_id
+            } else {
+              this.orderFormVisible = true;
+              this.orderOperationKey = '恢复项目';
+              this.currProjectId = row.project_id
+            }
           }, 
           disable: row=>{return (row.status != '未提交')}
         },
@@ -361,6 +381,23 @@ export default {
     }
   },
   methods: {
+    IsProjectDateAllValid(projectForm) {
+      console.log(projectForm)
+      let valid = true;
+      [ 
+        'processing_start_time', 
+        'processing_end_time', 
+        'review_start_time',
+        'review_end_time',
+        'project_end_time'
+      ].forEach((property)=>{
+        console.log(projectForm[property])
+        if (lessThanToday(projectForm[property])) {
+          valid = false;
+        }
+      })
+      return valid;
+    },
     toNewProject() {
       this.$router.push({path: '/project/new_project'})
     },
